@@ -1,0 +1,552 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@ims.com",
+      "password": "Admin@123",
+      "name": "System Admin",
+      "role": "admin",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    },
+    {
+      "id": "2",
+      "email": "manager@ims.com",
+      "password": "Manager@123",
+      "name": "Inventory Manager",
+      "role": "manager",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    },
+    {
+      "id": "3",
+      "email": "sales@ims.com",
+      "password": "Sales@123",
+      "name": "Salesperson",
+      "role": "salesperson",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "productCode": "P001",
+      "name": "Laptop Dell XPS",
+      "category": "Electronics",
+      "quantity": 50,
+      "price": 25000000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "productCode": "P002",
+      "name": "Wireless Mouse",
+      "category": "Electronics",
+      "quantity": 200,
+      "price": 350000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "productCode": "P003",
+      "name": "Mineral Water 500ml",
+      "category": "Consumables",
+      "quantity": 500,
+      "price": 10000,
+      "supplierId": "2",
+      "expiryDate": "2025-06-01",
+      "status": "active"
+    },
+    {
+      "id": "4",
+      "productCode": "P004",
+      "name": "Notebook A4",
+      "category": "Stationery",
+      "quantity": 300,
+      "price": 25000,
+      "supplierId": "3",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "5",
+      "productCode": "P005",
+      "name": "Instant Noodles",
+      "category": "Consumables",
+      "quantity": 1000,
+      "price": 5000,
+      "supplierId": "2",
+      "expiryDate": "2024-12-01",
+      "status": "active"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "1",
+      "name": "Tech Supplier Co.",
+      "phone": "0901234567",
+      "address": "123 Nguyen Trai, Ha Noi",
+      "email": "tech@supplier.com"
+    },
+    {
+      "id": "2",
+      "name": "Food & Drink Ltd.",
+      "phone": "0912345678",
+      "address": "456 Le Loi, Ho Chi Minh",
+      "email": "food@supplier.com"
+    },
+    {
+      "id": "3",
+      "name": "Office Supplies Inc.",
+      "phone": "0923456789",
+      "address": "789 Tran Hung Dao, Da Nang",
+      "email": "office@supplier.com"
+    }
+  ],
+  "customers": [
+    {
+      "id": "1",
+      "name": "Nguyen Van A",
+      "phone": "0934567890",
+      "email": "nguyenvana@gmail.com"
+    },
+    {
+      "id": "2",
+      "name": "Tran Thi B",
+      "phone": "0945678901",
+      "email": "tranthib@gmail.com"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "1",
+      "receiptCode": "RC001",
+      "customerId": "1",
+      "items": [
+        {
+          "productId": "2",
+          "productName": "Wireless Mouse",
+          "quantity": 2,
+          "unitPrice": 350000
+        }
+      ],
+      "subtotal": 700000,
+      "discount": 70000,
+      "tax": 63000,
+      "total": 693000,
+      "status": "completed",
+      "createdBy": "3",
+      "createdAt": "2026-01-10T10:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "orderCode": "ORD001",
+      "supplierId": "1",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Laptop Dell XPS",
+          "quantity": 10,
+          "unitPrice": 20000000
+        }
+      ],
+      "total": 200000000,
+      "status": "pending",
+      "createdBy": "2",
+      "createdAt": "2026-01-15T09:00:00Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "1",
+      "invoiceCode": "INV001",
+      "orderId": "1",
+      "total": 200000000,
+      "createdAt": "2026-01-15T09:30:00Z"
+    }
+  ],
+  "customer_requests": [
+    {
+      "id": "1",
+      "productName": "Gaming Keyboard",
+      "customerName": "Nguyen Van C",
+      "phone": "0956789012",
+      "note": "Need RGB keyboard",
+      "status": "pending",
+      "createdBy": "3",
+      "createdAt": "2026-01-20T14:00:00Z"
+    }
+  ],
+  "system_logs": [
+    {
+      "id": "1",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "2",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Add Goods",
+      "description": "Added product P001 - Laptop Dell XPS",
+      "timestamp": "2026-01-10T09:00:00Z"
+    },
+    {
+      "id": "d8e0",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:24:05.301Z"
+    },
+    {
+      "id": "5fb0",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:28:14.522Z"
+    },
+    {
+      "id": "00e0",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:28:15.522Z"
+    },
+    {
+      "id": "5f42",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:28:22.155Z"
+    },
+    {
+      "id": "2f86",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:28:23.194Z"
+    },
+    {
+      "id": "04c2",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:29:36.381Z"
+    },
+    {
+      "id": "938f",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:29:55.022Z"
+    },
+    {
+      "id": "4f23",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:30:10.111Z"
+    },
+    {
+      "id": "a2f2",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:30:15.023Z"
+    },
+    {
+      "id": "5966",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:31:02.617Z"
+    },
+    {
+      "id": "e237",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:31:06.925Z"
+    },
+    {
+      "id": "1fd3",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:33:54.531Z"
+    },
+    {
+      "id": "9d3a",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:34:00.051Z"
+    },
+    {
+      "id": "9912",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:34:18.866Z"
+    },
+    {
+      "id": "a756",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:34:20.112Z"
+    },
+    {
+      "id": "7860",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:34:23.911Z"
+    },
+    {
+      "id": "d730",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:34:28.999Z"
+    },
+    {
+      "id": "dd1b",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:35:21.957Z"
+    },
+    {
+      "id": "8122",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:35:32.620Z"
+    },
+    {
+      "id": "aa02",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:35:34.480Z"
+    },
+    {
+      "id": "7e66",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:35:38.569Z"
+    },
+    {
+      "id": "1fd6",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:36:32.990Z"
+    },
+    {
+      "id": "48ad",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:36:34.957Z"
+    },
+    {
+      "id": "3983",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:37:00.590Z"
+    },
+    {
+      "id": "1f04",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:37:07.189Z"
+    },
+    {
+      "id": "31c3",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:38:50.372Z"
+    },
+    {
+      "id": "5935",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:38:56.875Z"
+    },
+    {
+      "id": "d64b",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:39:25.695Z"
+    },
+    {
+      "id": "1c9a",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:39:32.117Z"
+    },
+    {
+      "id": "fb13",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:45:26.670Z"
+    },
+    {
+      "id": "73b4",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:45:31.895Z"
+    },
+    {
+      "id": "a515",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:45:44.021Z"
+    },
+    {
+      "id": "7d9f",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:45:48.366Z"
+    },
+    {
+      "id": "eaf8",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:56:20.026Z"
+    },
+    {
+      "id": "37c9",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:56:25.185Z"
+    },
+    {
+      "id": "79c3",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T05:56:35.640Z"
+    },
+    {
+      "id": "5394",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T05:56:42.524Z"
+    },
+    {
+      "id": "0554",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T06:10:41.651Z"
+    },
+    {
+      "id": "9ecf",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T06:10:46.020Z"
+    },
+    {
+      "id": "e0cb",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-22T06:10:48.664Z"
+    },
+    {
+      "id": "b413",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T06:10:52.202Z"
+    },
+    {
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T06:57:50.614Z",
+      "id": "HjI3BZP"
+    },
+    {
+      "id": "dd93",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-22T07:13:10.535Z"
+    }
+  ]
+}
