@@ -4,6 +4,9 @@ import axios from "axios";
 import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
 import ConfirmModal from "../../components/ConfirmModal";
+import ProductAutocomplete, {
+  Product,
+} from "../../components/ProductAutocomplete";
 
 const REASONS = [
   { value: "Damaged", icon: "💥", color: "#dc2626", bg: "#fee2e2" },
@@ -14,46 +17,25 @@ const REASONS = [
 
 const RemoveGoods = () => {
   const navigate = useNavigate();
-  const [searchCode, setSearchCode] = useState("");
-  const [product, setProduct] = useState(null);
-  const [notFound, setNotFound] = useState(false);
-  const [searching, setSearching] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
   const [removeQty, setRemoveQty] = useState("");
   const [reason, setReason] = useState("Damaged");
-  const [errors, setErrors] = useState({});
-  const [confirm, setConfirm] = useState({ show: false });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const handleSearch = async () => {
-    setNotFound(false);
-    setProduct(null);
-    setSearching(true);
-    try {
-      const res = await axios.get(
-        `http://localhost:9999/products?productCode=${searchCode}`,
-      );
-      if (!res.data[0]) {
-        setNotFound(true);
-        return;
-      }
-      setProduct(res.data[0]);
-    } finally {
-      setSearching(false);
-    }
-  };
-
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     const qty = parseInt(removeQty);
     if (!removeQty || qty <= 0) e.qty = "Quantity must be > 0.";
-    else if (qty > product.quantity)
+    else if (product && qty > product.quantity)
       e.qty = `Cannot exceed current stock (${product.quantity}).`;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const handleRemoveClick = () => {
-    if (!validate()) return;
+    if (!product || !validate()) return;
     setConfirm({
       show: true,
       title: "Confirm Removal",
@@ -101,41 +83,19 @@ const RemoveGoods = () => {
       </div>
 
       <div style={{ maxWidth: 580 }}>
-        {/* Search */}
         <div className="card-box">
-          <label className="form-label-ims">Product Code *</label>
-          <div style={{ display: "flex", gap: 10 }}>
-            <input
-              className="form-control-ims"
-              placeholder="e.g. P001"
-              value={searchCode}
-              onChange={(e) => {
-                setSearchCode(e.target.value);
-                setProduct(null);
-              }}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <button
-              className="btn-primary-ims"
-              onClick={handleSearch}
-              disabled={searching || !searchCode}
-            >
-              {searching ? <span className="btn-spinner" /> : "🔍 Search"}
-            </button>
-          </div>
-          {notFound && (
-            <div
-              className="alert-ims alert-warning"
-              style={{ marginTop: 12, marginBottom: 0 }}
-            >
-              ⚠ Product not found.
-            </div>
-          )}
+          <label className="form-label-ims">Search Product *</label>
+          <ProductAutocomplete
+            onSelect={(p) => {
+              setProduct(p);
+              setRemoveQty("");
+            }}
+            placeholder="Type product name or code..."
+          />
         </div>
 
         {product && (
           <>
-            {/* Product info */}
             <div className="card-box" style={{ padding: "16px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div
@@ -193,7 +153,6 @@ const RemoveGoods = () => {
               </div>
             </div>
 
-            {/* Remove form */}
             <div className="card-box">
               <div style={{ marginBottom: 20 }}>
                 <label className="form-label-ims">Removal Reason *</label>
@@ -245,7 +204,7 @@ const RemoveGoods = () => {
                     <div
                       style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}
                     >
-                      Stock after removal:{" "}
+                      Stock after:{" "}
                       <strong style={{ color: "#dc2626" }}>
                         {product.quantity - parseInt(removeQty)}
                       </strong>
@@ -253,7 +212,6 @@ const RemoveGoods = () => {
                   )}
               </div>
 
-              {/* Summary */}
               {removeQty && parseInt(removeQty) > 0 && (
                 <div
                   style={{

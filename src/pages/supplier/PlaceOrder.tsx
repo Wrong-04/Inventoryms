@@ -1,23 +1,50 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getUser, addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
 import ConfirmModal from "../../components/ConfirmModal";
+import ProductAutocomplete, {
+  Product,
+} from "../../components/ProductAutocomplete";
+
+interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+const StepBadge = ({ n }: { n: number }) => (
+  <div
+    style={{
+      width: 24,
+      height: 24,
+      borderRadius: "50%",
+      background: "#2563eb",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 12,
+      fontWeight: 700,
+      flexShrink: 0,
+    }}
+  >
+    {n}
+  </div>
+);
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
   const user = getUser();
-  const [suppliers, setSuppliers] = useState([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [supplierId, setSupplierId] = useState("");
-  const [searchCode, setSearchCode] = useState("");
-  const [foundProduct, setFoundProduct] = useState(null);
-  const [notFound, setNotFound] = useState(false);
-  const [searching, setSearching] = useState(false);
+  const [foundProduct, setFoundProduct] = useState<Product | null>(null);
   const [orderQty, setOrderQty] = useState("");
-  const [orderItems, setOrderItems] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [confirm, setConfirm] = useState({ show: false });
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
@@ -27,28 +54,10 @@ const PlaceOrder = () => {
     });
   }, []);
 
-  const handleSearch = async () => {
-    setNotFound(false);
-    setFoundProduct(null);
-    setSearching(true);
-    try {
-      const res = await axios.get(
-        `http://localhost:9999/products?productCode=${searchCode}`,
-      );
-      if (res.data.length === 0) {
-        setNotFound(true);
-        return;
-      }
-      setFoundProduct(res.data[0]);
-    } finally {
-      setSearching(false);
-    }
-  };
-
   const handleAddItem = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!foundProduct) {
-      e.product = "Search a product first.";
+      e.product = "Select a product first.";
       setErrors(e);
       return;
     }
@@ -79,7 +88,6 @@ const PlaceOrder = () => {
       ]);
     }
     setFoundProduct(null);
-    setSearchCode("");
     setOrderQty("");
   };
 
@@ -108,7 +116,7 @@ const PlaceOrder = () => {
             items: orderItems,
             total,
             status: "pending",
-            createdBy: user.id,
+            createdBy: user!.id,
             createdAt: new Date().toISOString(),
           });
           await addLog("Place Order", `Placed order ${code} to supplier`);
@@ -156,22 +164,7 @@ const PlaceOrder = () => {
               marginBottom: 16,
             }}
           >
-            <div
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: "50%",
-                background: "#2563eb",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-            >
-              1
-            </div>
+            <StepBadge n={1} />
             <span style={{ fontWeight: 600, fontSize: 14, color: "#1a2332" }}>
               Select Supplier
             </span>
@@ -228,22 +221,7 @@ const PlaceOrder = () => {
               marginBottom: 16,
             }}
           >
-            <div
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: "50%",
-                background: "#2563eb",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-            >
-              2
-            </div>
+            <StepBadge n={2} />
             <span style={{ fontWeight: 600, fontSize: 14, color: "#1a2332" }}>
               Add Items
             </span>
@@ -256,29 +234,17 @@ const PlaceOrder = () => {
               flexWrap: "wrap",
             }}
           >
-            <div style={{ flex: "2 1 180px" }}>
-              <label className="form-label-ims">Product Code</label>
-              <input
-                className={`form-control-ims${errors.product ? " is-invalid" : ""}`}
-                value={searchCode}
-                onChange={(e) => {
-                  setSearchCode(e.target.value);
-                  setFoundProduct(null);
+            <div style={{ flex: "2 1 240px" }}>
+              <label className="form-label-ims">Product</label>
+              <ProductAutocomplete
+                onSelect={(p) => {
+                  setFoundProduct(p);
+                  setErrors({});
                 }}
-                placeholder="e.g. P001"
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Type product name or code..."
+                error={errors.product}
               />
-              {errors.product && (
-                <div className="invalid-feedback-ims">⚠ {errors.product}</div>
-              )}
             </div>
-            <button
-              className="btn-secondary-ims"
-              onClick={handleSearch}
-              disabled={searching || !searchCode}
-            >
-              {searching ? <span className="btn-spinner-dark" /> : "Find"}
-            </button>
             <div style={{ flex: "1 1 120px" }}>
               <label className="form-label-ims">Quantity</label>
               <input
@@ -297,14 +263,6 @@ const PlaceOrder = () => {
               + Add
             </button>
           </div>
-          {notFound && (
-            <div
-              className="alert-ims alert-warning"
-              style={{ marginTop: 12, marginBottom: 0 }}
-            >
-              ⚠ Product not found.
-            </div>
-          )}
           {foundProduct && (
             <div
               className="alert-ims alert-info"
@@ -328,22 +286,7 @@ const PlaceOrder = () => {
                 borderBottom: "1px solid #e8edf3",
               }}
             >
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  background: "#2563eb",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                3
-              </div>
+              <StepBadge n={3} />
               <span style={{ fontWeight: 600, fontSize: 14, color: "#1a2332" }}>
                 Review Order
               </span>
