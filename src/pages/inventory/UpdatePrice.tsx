@@ -3,34 +3,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
+import ProductAutocomplete, {
+  Product,
+} from "../../components/ProductAutocomplete";
 
 const UpdatePrice = () => {
   const navigate = useNavigate();
-  const [searchCode, setSearchCode] = useState("");
-  const [product, setProduct] = useState(null);
-  const [notFound, setNotFound] = useState(false);
-  const [searching, setSearching] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
   const [newPrice, setNewPrice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleSearch = async () => {
-    setNotFound(false);
-    setProduct(null);
-    setSearching(true);
-    try {
-      const res = await axios.get(
-        `http://localhost:9999/products?productCode=${searchCode}`,
-      );
-      if (!res.data[0]) {
-        setNotFound(true);
-        return;
-      }
-      setProduct(res.data[0]);
-    } finally {
-      setSearching(false);
-    }
-  };
 
   const handleUpdate = async () => {
     const price = parseFloat(newPrice);
@@ -38,6 +20,7 @@ const UpdatePrice = () => {
       setError("New price must be greater than 0.");
       return;
     }
+    if (!product) return;
     setError("");
     setLoading(true);
     try {
@@ -76,41 +59,20 @@ const UpdatePrice = () => {
       </div>
 
       <div style={{ maxWidth: 520 }}>
-        {/* Search */}
         <div className="card-box">
-          <label className="form-label-ims">Product Code *</label>
-          <div style={{ display: "flex", gap: 10 }}>
-            <input
-              className="form-control-ims"
-              placeholder="e.g. P001"
-              value={searchCode}
-              onChange={(e) => {
-                setSearchCode(e.target.value);
-                setProduct(null);
-              }}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <button
-              className="btn-primary-ims"
-              onClick={handleSearch}
-              disabled={searching || !searchCode}
-            >
-              {searching ? <span className="btn-spinner" /> : "🔍 Search"}
-            </button>
-          </div>
-          {notFound && (
-            <div
-              className="alert-ims alert-warning"
-              style={{ marginTop: 12, marginBottom: 0 }}
-            >
-              ⚠ Product not found.
-            </div>
-          )}
+          <label className="form-label-ims">Search Product *</label>
+          <ProductAutocomplete
+            onSelect={(p) => {
+              setProduct(p);
+              setNewPrice("");
+              setError("");
+            }}
+            placeholder="Type product name or code..."
+          />
         </div>
 
         {product && (
           <>
-            {/* Product info */}
             <div className="card-box" style={{ padding: "16px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div
@@ -168,7 +130,6 @@ const UpdatePrice = () => {
               </div>
             </div>
 
-            {/* Update form */}
             <div className="card-box">
               <div style={{ marginBottom: 20 }}>
                 <label className="form-label-ims">New Price (VND) *</label>
@@ -187,7 +148,6 @@ const UpdatePrice = () => {
                 />
                 {error && <div className="invalid-feedback-ims">⚠ {error}</div>}
 
-                {/* Price diff preview */}
                 {priceDiff !== null && newPrice && parseFloat(newPrice) > 0 && (
                   <div
                     style={{

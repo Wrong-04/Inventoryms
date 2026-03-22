@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "../../components/Pagination";
+import ProductAutocomplete, {
+  Product,
+} from "../../components/ProductAutocomplete";
 
 const CATEGORIES = [
   "All Categories",
@@ -12,52 +15,42 @@ const CATEGORIES = [
 const PAGE_SIZE = 10;
 
 const ItemSearch = () => {
-  const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState("All Categories");
-  const [filtered, setFiltered] = useState([]);
-  const [searched, setSearched] = useState(false);
-  const [warning, setWarning] = useState("");
+  const [filtered, setFiltered] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState("productCode");
-  const [sortDir, setSortDir] = useState("asc");
+  const [sortKey, setSortKey] = useState<keyof Product>("productCode");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:9999/products")
-      .then((r) => setProducts(r.data));
+    axios.get<Product[]>("http://localhost:9999/products").then((r) => {
+      setProducts(r.data);
+      setFiltered(r.data.filter((p) => p.status === "active"));
+    });
   }, []);
 
-  const runFilter = (s, c, prods) => {
-    setWarning("");
-    let results = (prods || products).filter((p) => p.status === "active");
-    if (s)
-      results = results.filter(
-        (p) =>
-          p.name.toLowerCase().includes(s.toLowerCase()) || p.productCode === s,
-      );
-    if (c !== "All Categories")
-      results = results.filter((p) => p.category === c);
-    if (results.length === 0)
-      setWarning("No products found matching your search.");
-    setFiltered(results);
+  const filterByCategory = (c: string, prods?: Product[]) => {
+    const base = (prods || products).filter((p) => p.status === "active");
+    const result =
+      c === "All Categories" ? base : base.filter((p) => p.category === c);
+    setFiltered(result);
     setPage(1);
   };
 
-  const handleSearch = () => {
-    setSearched(true);
-    runFilter(search, category);
-  };
-  const handleReset = () => {
-    setSearch("");
-    setCategory("All Categories");
-    setFiltered([]);
-    setSearched(false);
-    setWarning("");
+  const handleSelect = (p: Product) => {
+    setSelectedProduct(p);
+    // highlight in table
+    setFiltered([p]);
     setPage(1);
   };
 
-  const handleSort = (key) => {
+  const handleClearSelection = () => {
+    setSelectedProduct(null);
+    filterByCategory(category);
+  };
+
+  const handleSort = (key: keyof Product) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
       setSortKey(key);
@@ -68,7 +61,8 @@ const ItemSearch = () => {
   const sorted = [...filtered].sort((a, b) => {
     const av = a[sortKey];
     const bv = b[sortKey];
-    if (typeof av === "number") return sortDir === "asc" ? av - bv : bv - av;
+    if (typeof av === "number" && typeof bv === "number")
+      return sortDir === "asc" ? av - bv : bv - av;
     return sortDir === "asc"
       ? String(av || "").localeCompare(String(bv || ""))
       : String(bv || "").localeCompare(String(av || ""));
@@ -77,7 +71,7 @@ const ItemSearch = () => {
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const stockBadge = (qty) => {
+  const stockBadge = (qty: number) => {
     if (qty === 0)
       return (
         <span className="badge-status badge-outofstock">Out of Stock</span>
@@ -87,7 +81,7 @@ const ItemSearch = () => {
     return <span className="badge-status badge-instock">In Stock</span>;
   };
 
-  const SortIcon = ({ k }) => {
+  const SortIcon = ({ k }: { k: keyof Product }) => {
     if (sortKey !== k)
       return <span style={{ opacity: 0.3, marginLeft: 4 }}>↕</span>;
     return (
@@ -95,7 +89,7 @@ const ItemSearch = () => {
     );
   };
 
-  const COLS = [
+  const COLS: { key: keyof Product; label: string }[] = [
     { key: "productCode", label: "Code" },
     { key: "name", label: "Name" },
     { key: "category", label: "Category" },
@@ -107,10 +101,18 @@ const ItemSearch = () => {
   return (
     <div>
       <div className="page-header">
-        <h4>📦 Inventory – Item Search</h4>
+        <div className="page-header-left">
+          <div className="page-header-icon" style={{ background: "#eff6ff" }}>
+            📦
+          </div>
+          <div>
+            <h4 style={{ margin: 0 }}>Item Search</h4>
+            <div className="page-header-sub">Search and browse inventory</div>
+          </div>
+        </div>
       </div>
 
-      <div className="card-box">
+      <div className="card-box" style={{ marginBottom: 16 }}>
         <div
           style={{
             display: "flex",
@@ -119,105 +121,183 @@ const ItemSearch = () => {
             flexWrap: "wrap",
           }}
         >
-          <div>
-            <label className="form-label-ims">Search Keyword</label>
-            <input
-              className="form-control-ims"
-              style={{ width: 240 }}
-              placeholder="Product name or code..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          <div style={{ flex: "2 1 260px" }}>
+            <label className="form-label-ims">
+              Quick Search (autocomplete)
+            </label>
+            <ProductAutocomplete
+              onSelect={handleSelect}
+              placeholder="Type product name or code..."
+              activeOnly={false}
             />
           </div>
-          <div>
-            <label className="form-label-ims">Category</label>
+          <div style={{ flex: "1 1 180px" }}>
+            <label className="form-label-ims">Filter by Category</label>
             <select
               className="form-select-ims"
-              style={{ width: 180 }}
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setSelectedProduct(null);
+                filterByCategory(e.target.value);
+              }}
             >
               {CATEGORIES.map((c) => (
                 <option key={c}>{c}</option>
               ))}
             </select>
           </div>
-          <button className="btn-primary-ims" onClick={handleSearch}>
-            🔍 Search
-          </button>
-          <button className="btn-secondary-ims" onClick={handleReset}>
-            Reset
-          </button>
+          {selectedProduct && (
+            <button
+              className="btn-secondary-ims"
+              onClick={handleClearSelection}
+            >
+              ✕ Clear Selection
+            </button>
+          )}
         </div>
+
+        {/* Selected product detail card */}
+        {selectedProduct && (
+          <div
+            style={{
+              marginTop: 16,
+              background: "#f0fdf4",
+              border: "1.5px solid #86efac",
+              borderRadius: 10,
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 10,
+                background: "#dcfce7",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 22,
+                flexShrink: 0,
+              }}
+            >
+              📦
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: "#15803d" }}>
+                {selectedProduct.name}
+              </div>
+              <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 3 }}>
+                <span style={{ fontWeight: 600, color: "#2563eb" }}>
+                  {selectedProduct.productCode}
+                </span>
+                &nbsp;·&nbsp;{selectedProduct.category}
+                &nbsp;·&nbsp;{selectedProduct.price.toLocaleString()} VND
+                {selectedProduct.expiryDate && (
+                  <>
+                    &nbsp;·&nbsp;Expiry:{" "}
+                    <span style={{ color: "#dc2626" }}>
+                      {selectedProduct.expiryDate}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#94a3b8",
+                  textTransform: "uppercase",
+                }}
+              >
+                Stock
+              </div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: selectedProduct.quantity <= 10 ? "#dc2626" : "#16a34a",
+                }}
+              >
+                {selectedProduct.quantity}
+              </div>
+              <div>{stockBadge(selectedProduct.quantity)}</div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {warning && (
-        <div
-          className={`alert-ims ${warning.startsWith("No") ? "alert-info" : "alert-warning"}`}
-        >
-          {warning}
+      <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="table-toolbar">
+          <span className="table-toolbar-title">
+            {selectedProduct
+              ? `Showing: ${selectedProduct.name}`
+              : "All Products"}
+          </span>
+          <span className="table-toolbar-meta">
+            {filtered.length} product(s) — click headers to sort
+          </span>
         </div>
-      )}
-
-      {searched && filtered.length > 0 && (
-        <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
-          <div className="table-toolbar">
-            <span className="table-toolbar-title">Search Results</span>
-            <span className="table-toolbar-meta">
-              {filtered.length} product(s) found — click headers to sort
-            </span>
-          </div>
-          <table className="ims-table">
-            <thead>
-              <tr>
-                {COLS.map(({ key, label }) => (
-                  <th
-                    key={key}
-                    className="sortable"
-                    onClick={() => handleSort(key)}
-                  >
-                    {label}
-                    <SortIcon k={key} />
-                  </th>
-                ))}
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((p) => (
-                <tr key={p.id}>
-                  <td style={{ fontWeight: 600 }}>{p.productCode}</td>
-                  <td>{p.name}</td>
-                  <td>{p.category}</td>
-                  <td>{p.quantity}</td>
-                  <td>{p.price.toLocaleString()}</td>
-                  <td style={{ color: p.expiryDate ? "#dc2626" : "#9ca3af" }}>
-                    {p.expiryDate || "N/A"}
-                  </td>
-                  <td>{stockBadge(p.quantity)}</td>
-                </tr>
+        <table className="ims-table">
+          <thead>
+            <tr>
+              {COLS.map(({ key, label }) => (
+                <th
+                  key={key}
+                  className="sortable"
+                  onClick={() => handleSort(key)}
+                >
+                  {label}
+                  <SortIcon k={key} />
+                </th>
               ))}
-            </tbody>
-          </table>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onChange={setPage}
-            total={sorted.length}
-            pageSize={PAGE_SIZE}
-          />
-        </div>
-      )}
-
-      {searched && filtered.length === 0 && !warning && (
-        <div className="card-box">
-          <div className="empty-state">
-            <div className="empty-icon">🔍</div>
-            <p>No products found. Try a different keyword.</p>
-          </div>
-        </div>
-      )}
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginated.length === 0 && (
+              <tr>
+                <td colSpan={7}>
+                  <div className="empty-state">
+                    <div className="empty-icon">🔍</div>
+                    <p>No products found.</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+            {paginated.map((p) => (
+              <tr
+                key={p.id}
+                style={
+                  selectedProduct?.id === p.id ? { background: "#f0fdf4" } : {}
+                }
+              >
+                <td style={{ fontWeight: 600 }}>{p.productCode}</td>
+                <td>{p.name}</td>
+                <td>{p.category}</td>
+                <td>{p.quantity}</td>
+                <td>{p.price.toLocaleString()}</td>
+                <td style={{ color: p.expiryDate ? "#dc2626" : "#9ca3af" }}>
+                  {p.expiryDate || "N/A"}
+                </td>
+                <td>{stockBadge(p.quantity)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onChange={setPage}
+          total={sorted.length}
+          pageSize={PAGE_SIZE}
+        />
+      </div>
     </div>
   );
 };

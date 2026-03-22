@@ -74,9 +74,9 @@ const Login = () => {
           await axios.patch(`http://localhost:9999/users/${user.id}`, {
             loginAttempts: attempts,
             status: "locked",
-            lockedUntil: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+            lockedUntil: new Date(Date.now() + 10 * 1000).toISOString(),
           });
-          setError("Too many failed attempts. Account locked for 30 minutes.");
+          setError("Too many failed attempts. Account locked for 10 seconds.");
         } else {
           await axios.patch(`http://localhost:9999/users/${user.id}`, {
             loginAttempts: attempts,

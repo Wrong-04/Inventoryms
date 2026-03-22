@@ -4,8 +4,19 @@ import axios from "axios";
 import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
 import ConfirmModal from "../../components/ConfirmModal";
+import ProductAutocomplete, {
+  Product,
+} from "../../components/ProductAutocomplete";
 
-const ProductCard = ({ product, label, error }) => (
+const ProductCard = ({
+  product,
+  label,
+  error,
+}: {
+  product: Product | null;
+  label: string;
+  error?: string;
+}) => (
   <div style={{ flex: 1 }}>
     <div
       style={{
@@ -67,42 +78,17 @@ const ProductCard = ({ product, label, error }) => (
 
 const ReplaceItem = () => {
   const navigate = useNavigate();
-  const [oldCode, setOldCode] = useState("");
-  const [newCode, setNewCode] = useState("");
-  const [oldProduct, setOldProduct] = useState(null);
-  const [newProduct, setNewProduct] = useState(null);
+  const [oldProduct, setOldProduct] = useState<Product | null>(null);
+  const [newProduct, setNewProduct] = useState<Product | null>(null);
   const [qty, setQty] = useState("");
-  const [errors, setErrors] = useState({});
-  const [searching, setSearching] = useState({ old: false, new: false });
-  const [confirm, setConfirm] = useState({ show: false });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const searchProduct = async (code, setter, field) => {
-    setSearching((s) => ({ ...s, [field]: true }));
-    try {
-      const res = await axios.get(
-        `http://localhost:9999/products?productCode=${code}`,
-      );
-      if (res.data.length === 0 || res.data[0].status !== "active") {
-        setter(null);
-        setErrors((e) => ({ ...e, [field]: "Product not found." }));
-        return;
-      }
-      setter(res.data[0]);
-      setErrors((e) => {
-        const n = { ...e };
-        delete n[field];
-        return n;
-      });
-    } finally {
-      setSearching((s) => ({ ...s, [field]: false }));
-    }
-  };
-
   const validate = () => {
-    const e = {};
-    if (!oldProduct) e.old = "Please find the old product first.";
-    if (!newProduct) e.new = "Please find the new product first.";
+    const e: Record<string, string> = {};
+    if (!oldProduct) e.old = "Please select the old product.";
+    if (!newProduct) e.new = "Please select the new product.";
     if (!qty || parseInt(qty) <= 0) e.qty = "Quantity must be > 0.";
     else if (oldProduct && parseInt(qty) > oldProduct.quantity)
       e.qty = `Cannot exceed old stock (${oldProduct.quantity}).`;
@@ -115,29 +101,29 @@ const ReplaceItem = () => {
     setConfirm({
       show: true,
       title: "Confirm Replacement",
-      message: `Replace ${qty} unit(s) of "${oldProduct.name}" with "${newProduct.name}"?`,
+      message: `Replace ${qty} unit(s) of "${oldProduct!.name}" with "${newProduct!.name}"?`,
       variant: "primary",
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
           const q = parseInt(qty);
-          await axios.patch(`http://localhost:9999/products/${oldProduct.id}`, {
-            quantity: oldProduct.quantity - q,
-          });
-          await axios.patch(`http://localhost:9999/products/${newProduct.id}`, {
-            quantity: newProduct.quantity + q,
-          });
+          await axios.patch(
+            `http://localhost:9999/products/${oldProduct!.id}`,
+            { quantity: oldProduct!.quantity - q },
+          );
+          await axios.patch(
+            `http://localhost:9999/products/${newProduct!.id}`,
+            { quantity: newProduct!.quantity + q },
+          );
           await addLog(
             "Replace Item",
-            `Replaced ${q} of ${oldProduct.name} with ${newProduct.name}`,
+            `Replaced ${q} of ${oldProduct!.name} with ${newProduct!.name}`,
           );
           toast.success(
-            `Replaced ${q} unit(s) of "${oldProduct.name}" → "${newProduct.name}".`,
+            `Replaced ${q} unit(s) of "${oldProduct!.name}" → "${newProduct!.name}".`,
           );
           setOldProduct(null);
           setNewProduct(null);
-          setOldCode("");
-          setNewCode("");
           setQty("");
         } catch {
           toast.error("Failed to replace item.");
@@ -168,7 +154,7 @@ const ReplaceItem = () => {
       </div>
 
       <div style={{ maxWidth: 720 }}>
-        {/* Step 1 - Search */}
+        {/* Step 1 */}
         <div className="card-box" style={{ marginBottom: 16 }}>
           <div
             style={{
@@ -208,39 +194,21 @@ const ReplaceItem = () => {
               alignItems: "start",
             }}
           >
-            {/* Old item */}
             <div>
-              <label className="form-label-ims">Old Item Code *</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  className={`form-control-ims${errors.old ? " is-invalid" : ""}`}
-                  value={oldCode}
-                  onChange={(e) => {
-                    setOldCode(e.target.value);
-                    setOldProduct(null);
-                  }}
-                  placeholder="e.g. P001"
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    searchProduct(oldCode, setOldProduct, "old")
-                  }
-                />
-                <button
-                  className="btn-secondary-ims"
-                  style={{ flexShrink: 0 }}
-                  disabled={searching.old || !oldCode}
-                  onClick={() => searchProduct(oldCode, setOldProduct, "old")}
-                >
-                  {searching.old ? (
-                    <span className="btn-spinner-dark" />
-                  ) : (
-                    "Find"
-                  )}
-                </button>
-              </div>
+              <label className="form-label-ims">Old Item *</label>
+              <ProductAutocomplete
+                onSelect={(p) => {
+                  setOldProduct(p);
+                  setErrors((e) => {
+                    const n = { ...e };
+                    delete n.old;
+                    return n;
+                  });
+                }}
+                placeholder="Search old product..."
+                error={errors.old}
+              />
             </div>
-
-            {/* Arrow */}
             <div
               style={{
                 display: "flex",
@@ -252,41 +220,23 @@ const ReplaceItem = () => {
             >
               →
             </div>
-
-            {/* New item */}
             <div>
-              <label className="form-label-ims">New Item Code *</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  className={`form-control-ims${errors.new ? " is-invalid" : ""}`}
-                  value={newCode}
-                  onChange={(e) => {
-                    setNewCode(e.target.value);
-                    setNewProduct(null);
-                  }}
-                  placeholder="e.g. P002"
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    searchProduct(newCode, setNewProduct, "new")
-                  }
-                />
-                <button
-                  className="btn-secondary-ims"
-                  style={{ flexShrink: 0 }}
-                  disabled={searching.new || !newCode}
-                  onClick={() => searchProduct(newCode, setNewProduct, "new")}
-                >
-                  {searching.new ? (
-                    <span className="btn-spinner-dark" />
-                  ) : (
-                    "Find"
-                  )}
-                </button>
-              </div>
+              <label className="form-label-ims">New Item *</label>
+              <ProductAutocomplete
+                onSelect={(p) => {
+                  setNewProduct(p);
+                  setErrors((e) => {
+                    const n = { ...e };
+                    delete n.new;
+                    return n;
+                  });
+                }}
+                placeholder="Search new product..."
+                error={errors.new}
+              />
             </div>
           </div>
 
-          {/* Product preview cards */}
           <div
             style={{
               display: "flex",
@@ -310,7 +260,7 @@ const ReplaceItem = () => {
           </div>
         </div>
 
-        {/* Step 2 - Quantity */}
+        {/* Step 2 */}
         <div className="card-box" style={{ marginBottom: 16 }}>
           <div
             style={{
@@ -355,17 +305,16 @@ const ReplaceItem = () => {
               <input
                 type="number"
                 min="1"
-                max={oldProduct?.quantity || undefined}
+                max={oldProduct?.quantity}
                 className={`form-control-ims${errors.qty ? " is-invalid" : ""}`}
                 value={qty}
                 onChange={(e) => setQty(e.target.value)}
                 placeholder="0"
               />
               {errors.qty && (
-                <div className="invalid-feedback-ims">{errors.qty}</div>
+                <div className="invalid-feedback-ims">⚠ {errors.qty}</div>
               )}
             </div>
-
             {oldProduct &&
               qty &&
               parseInt(qty) > 0 &&
@@ -400,7 +349,6 @@ const ReplaceItem = () => {
           </div>
         </div>
 
-        {/* Actions */}
         <div style={{ display: "flex", gap: 10 }}>
           <button
             className="btn-primary-ims"

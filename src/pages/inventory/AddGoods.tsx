@@ -6,7 +6,41 @@ import { toast } from "../../utils/toast";
 
 const CATEGORIES = ["Electronics", "Consumables", "Stationery", "Other"];
 
-const Field = ({ label, required, children, error, hint }) => (
+interface Supplier {
+  id: string;
+  name: string;
+}
+interface FormState {
+  name: string;
+  category: string;
+  quantity: string;
+  supplierId: string;
+  expiryDate: string;
+}
+interface ExistingProduct {
+  id: string;
+  name: string;
+  quantity: number;
+}
+interface CustomerReq {
+  id: string;
+  productName: string;
+  status: string;
+}
+
+const Field = ({
+  label,
+  required,
+  children,
+  error,
+  hint,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+  error?: string;
+  hint?: string;
+}) => (
   <div>
     <label className="form-label-ims">
       {label}
@@ -22,27 +56,30 @@ const Field = ({ label, required, children, error, hint }) => (
 
 const AddGoods = () => {
   const navigate = useNavigate();
-  const [suppliers, setSuppliers] = useState([]);
-  const [form, setForm] = useState({
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [form, setForm] = useState<FormState>({
     name: "",
     category: "Electronics",
     quantity: "",
     supplierId: "",
     expiryDate: "",
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [dupModal, setDupModal] = useState({ show: false, existing: null });
+  const [dupModal, setDupModal] = useState<{
+    show: boolean;
+    existing: ExistingProduct | null;
+  }>({ show: false, existing: null });
   const [dupLoading, setDupLoading] = useState(false);
 
   useEffect(() => {
     axios
-      .get("http://localhost:9999/suppliers")
+      .get<Supplier[]>("http://localhost:9999/suppliers")
       .then((r) => setSuppliers(r.data));
   }, []);
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.name.trim()) e.name = "Name is required.";
     if (!form.supplierId) e.supplierId = "Supplier is required.";
     if (!form.quantity || parseInt(form.quantity) <= 0)
@@ -69,8 +106,30 @@ const AddGoods = () => {
     }
   };
 
+  const autoFulfillRequests = async (productName: string) => {
+    const res = await axios.get<CustomerReq[]>(
+      "http://localhost:9999/customer_requests?status=pending",
+    );
+    const lower = productName.toLowerCase();
+    const matches = res.data.filter(
+      (r) =>
+        r.productName.toLowerCase().includes(lower) ||
+        lower.includes(r.productName.toLowerCase()),
+    );
+    for (const req of matches) {
+      await axios.patch(`http://localhost:9999/customer_requests/${req.id}`, {
+        status: "fulfilled",
+      });
+    }
+    if (matches.length > 0) {
+      toast.info(
+        `Auto-fulfilled ${matches.length} customer request(s) for "${productName}".`,
+      );
+    }
+  };
+
   const saveNew = async () => {
-    const allRes = await axios.get("http://localhost:9999/products");
+    const allRes = await axios.get<unknown[]>("http://localhost:9999/products");
     const newCode = "P" + String(allRes.data.length + 1).padStart(3, "0");
     await axios.post("http://localhost:9999/products", {
       productCode: newCode,
@@ -82,6 +141,7 @@ const AddGoods = () => {
       expiryDate: form.expiryDate || null,
       status: "active",
     });
+    await autoFulfillRequests(form.name);
     await addLog("Add Goods", `Added product ${form.name}`);
     toast.success(`Product "${form.name}" added successfully!`);
     setForm({
@@ -100,6 +160,7 @@ const AddGoods = () => {
       await axios.patch(`http://localhost:9999/products/${existing.id}`, {
         quantity: existing.quantity + parseInt(form.quantity),
       });
+      await autoFulfillRequests(existing.name);
       await addLog(
         "Add Goods",
         `Increased stock for ${existing.name} by ${form.quantity}`,
