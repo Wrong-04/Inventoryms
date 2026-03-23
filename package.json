@@ -17,10 +17,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "vite",
+    "start": "concurrently \"vite\" \"json-server --watch database.json --port 9999\"",
     "build": "vite build",
-    "preview": "vite preview",
-    "server": "json-server --watch database.json --port 9999"
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -46,7 +45,8 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.7.0",
-    "typescript": "^5.9.3",
+    "concurrently": "^9.2.1",
+    "typescript": "^4.9.5",
     "vite": "^6.4.1"
   }
 }

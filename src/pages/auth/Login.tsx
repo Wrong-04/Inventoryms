@@ -135,7 +135,33 @@ const Login = () => {
             />
           </div>
           <div style={{ marginBottom: 24 }}>
-            <label className="form-label-ims">Password</label>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 6,
+              }}
+            >
+              <label className="form-label-ims" style={{ margin: 0 }}>
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#3b82f6",
+                  fontSize: 12,
+                  cursor: "pointer",
+                  padding: 0,
+                  fontWeight: 600,
+                }}
+              >
+                Forgot Password?
+              </button>
+            </div>
             <div className="password-input-wrap">
               <input
                 type={showPwd ? "text" : "password"}
