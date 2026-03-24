@@ -1,0 +1,715 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@ims.com",
+      "password": "Admin@123",
+      "name": "System Admin",
+      "role": "admin",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    },
+    {
+      "id": "2",
+      "email": "manager@ims.com",
+      "password": "Manager@123",
+      "name": "Inventory Manager",
+      "role": "manager",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    },
+    {
+      "id": "3",
+      "email": "sales@ims.com",
+      "password": "Sales@123",
+      "name": "Salesperson",
+      "role": "salesperson",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    },
+    {
+      "id": "4",
+      "email": "sales2@ims.com",
+      "password": "Sales@123",
+      "name": "Salesperson 2",
+      "role": "salesperson",
+      "status": "active",
+      "loginAttempts": 0,
+      "lockedUntil": null
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "productCode": "P001",
+      "name": "Laptop Dell XPS 15",
+      "category": "Electronics",
+      "quantity": 25,
+      "price": 25000000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "productCode": "P002",
+      "name": "Wireless Mouse Logitech",
+      "category": "Electronics",
+      "quantity": 150,
+      "price": 350000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "productCode": "P003",
+      "name": "Mechanical Keyboard",
+      "category": "Electronics",
+      "quantity": 8,
+      "price": 1200000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "4",
+      "productCode": "P004",
+      "name": "USB-C Hub 7-in-1",
+      "category": "Electronics",
+      "quantity": 3,
+      "price": 650000,
+      "supplierId": "1",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "5",
+      "productCode": "P005",
+      "name": "Mineral Water 500ml",
+      "category": "Consumables",
+      "quantity": 500,
+      "price": 10000,
+      "supplierId": "2",
+      "expiryDate": "2025-06-01",
+      "status": "active"
+    },
+    {
+      "id": "6",
+      "productCode": "P006",
+      "name": "Instant Noodles Hảo Hảo",
+      "category": "Consumables",
+      "quantity": 200,
+      "price": 5000,
+      "supplierId": "2",
+      "expiryDate": "2024-12-01",
+      "status": "active"
+    },
+    {
+      "id": "7",
+      "productCode": "P007",
+      "name": "Energy Drink Redbull",
+      "category": "Consumables",
+      "quantity": 0,
+      "price": 15000,
+      "supplierId": "2",
+      "expiryDate": "2025-03-01",
+      "status": "active"
+    },
+    {
+      "id": "8",
+      "productCode": "P008",
+      "name": "Notebook A4 Thiên Long",
+      "category": "Stationery",
+      "quantity": 300,
+      "price": 25000,
+      "supplierId": "3",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "9",
+      "productCode": "P009",
+      "name": "Ballpoint Pen Blue",
+      "category": "Stationery",
+      "quantity": 500,
+      "price": 5000,
+      "supplierId": "3",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "10",
+      "productCode": "P010",
+      "name": "Sticky Notes 3x3",
+      "category": "Stationery",
+      "quantity": 6,
+      "price": 20000,
+      "supplierId": "3",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "11",
+      "productCode": "P011",
+      "name": "Stapler Heavy Duty",
+      "category": "Stationery",
+      "quantity": 45,
+      "price": 85000,
+      "supplierId": "3",
+      "expiryDate": null,
+      "status": "active"
+    },
+    {
+      "id": "12",
+      "productCode": "P012",
+      "name": "Hand Sanitizer 500ml",
+      "category": "Other",
+      "quantity": 80,
+      "price": 45000,
+      "supplierId": "2",
+      "expiryDate": "2024-11-01",
+      "status": "active"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "1",
+      "name": "Tech Supplier Co.",
+      "phone": "0901234567",
+      "address": "123 Nguyen Trai, Ha Noi",
+      "email": "tech@supplier.com"
+    },
+    {
+      "id": "2",
+      "name": "Food & Drink Ltd.",
+      "phone": "0912345678",
+      "address": "456 Le Loi, Ho Chi Minh",
+      "email": "food@supplier.com"
+    },
+    {
+      "id": "3",
+      "name": "Office Supplies Inc.",
+      "phone": "0923456789",
+      "address": "789 Tran Hung Dao, Da Nang",
+      "email": "office@supplier.com"
+    }
+  ],
+  "customers": [
+    {
+      "id": "1",
+      "name": "Nguyen Van A",
+      "phone": "0934567890",
+      "email": "nguyenvana@gmail.com"
+    },
+    {
+      "id": "2",
+      "name": "Tran Thi B",
+      "phone": "0945678901",
+      "email": "tranthib@gmail.com"
+    },
+    {
+      "id": "3",
+      "name": "Le Van C",
+      "phone": "0956789012",
+      "email": "levanc@gmail.com"
+    },
+    {
+      "id": "4",
+      "name": "Pham Thi D",
+      "phone": "0967890123",
+      "email": "phamthid@gmail.com"
+    },
+    {
+      "id": "5",
+      "name": "Hoang Van E",
+      "phone": "0978901234",
+      "email": "hoangvane@gmail.com"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "1",
+      "receiptCode": "RC001",
+      "customerId": "1",
+      "items": [
+        {
+          "productId": "2",
+          "productName": "Wireless Mouse Logitech",
+          "quantity": 2,
+          "unitPrice": 350000
+        }
+      ],
+      "subtotal": 700000,
+      "discount": 0,
+      "tax": 70000,
+      "total": 770000,
+      "status": "completed",
+      "createdBy": "3",
+      "createdAt": "2026-01-10T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "receiptCode": "RC002",
+      "customerId": "2",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Laptop Dell XPS 15",
+          "quantity": 1,
+          "unitPrice": 25000000
+        },
+        {
+          "productId": "2",
+          "productName": "Wireless Mouse Logitech",
+          "quantity": 1,
+          "unitPrice": 350000
+        }
+      ],
+      "subtotal": 25350000,
+      "discount": 2535000,
+      "tax": 2281500,
+      "total": 25096500,
+      "status": "completed",
+      "createdBy": "3",
+      "createdAt": "2026-02-14T09:30:00Z"
+    },
+    {
+      "id": "3",
+      "receiptCode": "RC003",
+      "customerId": "3",
+      "items": [
+        {
+          "productId": "8",
+          "productName": "Notebook A4 Thiên Long",
+          "quantity": 10,
+          "unitPrice": 25000
+        },
+        {
+          "productId": "9",
+          "productName": "Ballpoint Pen Blue",
+          "quantity": 20,
+          "unitPrice": 5000
+        }
+      ],
+      "subtotal": 350000,
+      "discount": 0,
+      "tax": 35000,
+      "total": 385000,
+      "status": "completed",
+      "createdBy": "4",
+      "createdAt": "2026-02-20T14:00:00Z"
+    },
+    {
+      "id": "4",
+      "receiptCode": "RC004",
+      "customerId": "4",
+      "items": [
+        {
+          "productId": "3",
+          "productName": "Mechanical Keyboard",
+          "quantity": 2,
+          "unitPrice": 1200000
+        },
+        {
+          "productId": "4",
+          "productName": "USB-C Hub 7-in-1",
+          "quantity": 1,
+          "unitPrice": 650000
+        }
+      ],
+      "subtotal": 3050000,
+      "discount": 305000,
+      "tax": 274500,
+      "total": 3019500,
+      "status": "completed",
+      "createdBy": "3",
+      "createdAt": "2026-03-01T11:00:00Z"
+    },
+    {
+      "id": "5",
+      "receiptCode": "RC005",
+      "customerId": "5",
+      "items": [
+        {
+          "productId": "2",
+          "productName": "Wireless Mouse Logitech",
+          "quantity": 5,
+          "unitPrice": 350000
+        }
+      ],
+      "subtotal": 1750000,
+      "discount": 175000,
+      "tax": 157500,
+      "total": 1732500,
+      "status": "completed",
+      "createdBy": "4",
+      "createdAt": "2026-03-05T16:00:00Z"
+    },
+    {
+      "id": "6",
+      "receiptCode": "RC006",
+      "customerId": "1",
+      "items": [
+        {
+          "productId": "11",
+          "productName": "Stapler Heavy Duty",
+          "quantity": 3,
+          "unitPrice": 85000
+        }
+      ],
+      "subtotal": 255000,
+      "discount": 0,
+      "tax": 25500,
+      "total": 280500,
+      "status": "cancelled",
+      "createdBy": "3",
+      "createdAt": "2026-03-10T08:00:00Z"
+    },
+    {
+      "id": "7",
+      "receiptCode": "RC007",
+      "customerId": "2",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Laptop Dell XPS 15",
+          "quantity": 2,
+          "unitPrice": 25000000
+        }
+      ],
+      "subtotal": 50000000,
+      "discount": 5000000,
+      "tax": 4500000,
+      "total": 49500000,
+      "status": "completed",
+      "createdBy": "3",
+      "createdAt": "2026-03-15T10:00:00Z"
+    },
+    {
+      "id": "8",
+      "receiptCode": "RC008",
+      "customerId": "3",
+      "items": [
+        {
+          "productId": "9",
+          "productName": "Ballpoint Pen Blue",
+          "quantity": 50,
+          "unitPrice": 5000
+        },
+        {
+          "productId": "10",
+          "productName": "Sticky Notes 3x3",
+          "quantity": 5,
+          "unitPrice": 20000
+        }
+      ],
+      "subtotal": 350000,
+      "discount": 0,
+      "tax": 35000,
+      "total": 385000,
+      "status": "completed",
+      "createdBy": "4",
+      "createdAt": "2026-03-20T13:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "orderCode": "ORD001",
+      "supplierId": "1",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Laptop Dell XPS 15",
+          "quantity": 10,
+          "unitPrice": 20000000
+        },
+        {
+          "productId": "2",
+          "productName": "Wireless Mouse Logitech",
+          "quantity": 50,
+          "unitPrice": 280000
+        }
+      ],
+      "total": 214000000,
+      "status": "received",
+      "createdBy": "2",
+      "createdAt": "2026-01-05T09:00:00Z"
+    },
+    {
+      "id": "2",
+      "orderCode": "ORD002",
+      "supplierId": "2",
+      "items": [
+        {
+          "productId": "5",
+          "productName": "Mineral Water 500ml",
+          "quantity": 200,
+          "unitPrice": 8000
+        },
+        {
+          "productId": "6",
+          "productName": "Instant Noodles Hảo Hảo",
+          "quantity": 100,
+          "unitPrice": 4000
+        }
+      ],
+      "total": 2000000,
+      "status": "received",
+      "createdBy": "2",
+      "createdAt": "2026-01-20T10:00:00Z"
+    },
+    {
+      "id": "3",
+      "orderCode": "ORD003",
+      "supplierId": "3",
+      "items": [
+        {
+          "productId": "8",
+          "productName": "Notebook A4 Thiên Long",
+          "quantity": 200,
+          "unitPrice": 20000
+        },
+        {
+          "productId": "9",
+          "productName": "Ballpoint Pen Blue",
+          "quantity": 500,
+          "unitPrice": 4000
+        }
+      ],
+      "total": 6000000,
+      "status": "invoiced",
+      "createdBy": "2",
+      "createdAt": "2026-03-10T09:00:00Z"
+    },
+    {
+      "id": "4",
+      "orderCode": "ORD004",
+      "supplierId": "1",
+      "items": [
+        {
+          "productId": "3",
+          "productName": "Mechanical Keyboard",
+          "quantity": 20,
+          "unitPrice": 950000
+        },
+        {
+          "productId": "4",
+          "productName": "USB-C Hub 7-in-1",
+          "quantity": 15,
+          "unitPrice": 500000
+        }
+      ],
+      "total": 26500000,
+      "status": "pending",
+      "createdBy": "2",
+      "createdAt": "2026-03-22T08:00:00Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "1",
+      "invoiceCode": "INV001",
+      "orderId": "1",
+      "total": 214000000,
+      "createdAt": "2026-01-05T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "invoiceCode": "INV002",
+      "orderId": "2",
+      "total": 2000000,
+      "createdAt": "2026-01-20T11:00:00Z"
+    },
+    {
+      "id": "3",
+      "invoiceCode": "INV003",
+      "orderId": "3",
+      "total": 6000000,
+      "createdAt": "2026-03-10T10:00:00Z"
+    }
+  ],
+  "customer_requests": [
+    {
+      "id": "1",
+      "productName": "iPhone 15 Pro",
+      "customerName": "Nguyen Van A",
+      "phone": "0934567890",
+      "note": "Cần gấp trước Tết",
+      "status": "fulfilled",
+      "createdBy": "3",
+      "createdByName": "Salesperson",
+      "createdAt": "2026-01-15T09:00:00Z"
+    },
+    {
+      "id": "2",
+      "productName": "Samsung Galaxy S24",
+      "customerName": "Tran Thi B",
+      "phone": "0945678901",
+      "note": "",
+      "status": "fulfilled",
+      "createdBy": "4",
+      "createdByName": "Salesperson 2",
+      "createdAt": "2026-02-10T10:00:00Z"
+    },
+    {
+      "id": "3",
+      "productName": "AirPods Pro 2",
+      "customerName": "Le Van C",
+      "phone": "0956789012",
+      "note": "Màu trắng",
+      "status": "pending",
+      "createdBy": "3",
+      "createdByName": "Salesperson",
+      "createdAt": "2026-03-18T14:00:00Z"
+    },
+    {
+      "id": "4",
+      "productName": "iPad Air M2",
+      "customerName": "Pham Thi D",
+      "phone": "0967890123",
+      "note": "256GB WiFi",
+      "status": "pending",
+      "createdBy": "4",
+      "createdByName": "Salesperson 2",
+      "createdAt": "2026-03-20T11:00:00Z"
+    },
+    {
+      "id": "5",
+      "productName": "Màn hình LG 27 inch",
+      "customerName": "Hoang Van E",
+      "phone": "0978901234",
+      "note": "4K IPS",
+      "status": "pending",
+      "createdBy": "3",
+      "createdByName": "Salesperson",
+      "createdAt": "2026-03-23T09:00:00Z"
+    }
+  ],
+  "system_logs": [
+    {
+      "id": "1",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "2",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Add Goods",
+      "description": "Added product P001 - Laptop Dell XPS 15",
+      "timestamp": "2026-01-10T09:00:00Z"
+    },
+    {
+      "id": "3",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Place Order",
+      "description": "Placed order ORD001 to supplier",
+      "timestamp": "2026-01-05T09:05:00Z"
+    },
+    {
+      "id": "4",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Generate Invoice",
+      "description": "Generated invoice INV001 for order ORD001",
+      "timestamp": "2026-01-05T10:00:00Z"
+    },
+    {
+      "id": "5",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Receive Goods",
+      "description": "Received goods for order ORD001",
+      "timestamp": "2026-01-06T08:00:00Z"
+    },
+    {
+      "id": "6",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-01-10T08:30:00Z"
+    },
+    {
+      "id": "7",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Generate Receipt",
+      "description": "Generated receipt RC001 for Nguyen Van A",
+      "timestamp": "2026-01-10T10:00:00Z"
+    },
+    {
+      "id": "8",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Generate Receipt",
+      "description": "Generated receipt RC002 for Tran Thi B",
+      "timestamp": "2026-02-14T09:30:00Z"
+    },
+    {
+      "id": "9",
+      "userId": "4",
+      "userName": "Salesperson 2",
+      "action": "Generate Receipt",
+      "description": "Generated receipt RC003 for Le Van C",
+      "timestamp": "2026-02-20T14:00:00Z"
+    },
+    {
+      "id": "10",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Generate Receipt",
+      "description": "Generated receipt RC004 for Pham Thi D",
+      "timestamp": "2026-03-01T11:00:00Z"
+    },
+    {
+      "id": "11",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Customer Request",
+      "description": "Logged request for: AirPods Pro 2",
+      "timestamp": "2026-03-18T14:00:00Z"
+    },
+    {
+      "id": "12",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Update Price",
+      "description": "Updated price of Wireless Mouse Logitech to 350000",
+      "timestamp": "2026-03-20T10:00:00Z"
+    },
+    {
+      "id": "13",
+      "userId": "3",
+      "userName": "Salesperson",
+      "action": "Cancel Receipt",
+      "description": "Cancelled receipt RC006",
+      "timestamp": "2026-03-10T08:30:00Z"
+    },
+    {
+      "id": "14",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Manage Users",
+      "description": "Created user sales2@ims.com",
+      "timestamp": "2026-03-01T08:00:00Z"
+    },
+    {
+      "id": "15",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Place Order",
+      "description": "Placed order ORD004 to supplier",
+      "timestamp": "2026-03-22T08:05:00Z"
+    }
+  ]
+}

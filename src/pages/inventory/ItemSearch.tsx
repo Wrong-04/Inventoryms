@@ -243,6 +243,23 @@ const ItemSearch = () => {
             {filtered.length} product(s) — click headers to sort
           </span>
         </div>
+        {!selectedProduct && filtered.length > 50 && (
+          <div
+            className="alert-ims"
+            style={{
+              margin: "0 16px 0",
+              background: "#fffbeb",
+              border: "1px solid #fcd34d",
+              borderRadius: 6,
+              padding: "8px 12px",
+              fontSize: 13,
+              color: "#92400e",
+            }}
+          >
+            ⚠ Too many results ({filtered.length}). Consider filtering by
+            category or using the search above.
+          </div>
+        )}
         <table className="ims-table">
           <thead>
             <tr>

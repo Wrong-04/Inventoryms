@@ -38,6 +38,7 @@ const CustomerRequest = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [search, setSearch] = useState("");
 
   const load = () =>
     axios
@@ -98,9 +99,15 @@ const CustomerRequest = () => {
     }
   };
 
-  const filtered = requests.filter(
-    (r) => filterStatus === "all" || r.status === filterStatus,
-  );
+  const filtered = requests.filter((r) => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      !q ||
+      r.productName.toLowerCase().includes(q) ||
+      r.customerName.toLowerCase().includes(q);
+    const matchStatus = filterStatus === "all" || r.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -203,6 +210,16 @@ const CustomerRequest = () => {
           <div className="table-toolbar">
             <span className="table-toolbar-title">All Requests</span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                className="form-control-ims"
+                style={{ width: 200, fontSize: 12.5 }}
+                placeholder="Search product or customer..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
               <span className="table-toolbar-meta">
                 {filtered.length} request(s)
               </span>

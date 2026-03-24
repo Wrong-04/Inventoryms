@@ -22,9 +22,22 @@ const ACTION_COLORS = {
   "Manage Expired Goods": "badge-expired",
 };
 
+interface Log {
+  id: string;
+  userId: string;
+  userName: string;
+  action: string;
+  description: string;
+  timestamp: string;
+}
+interface User {
+  id: string;
+  name: string;
+}
+
 const SystemLogs = () => {
-  const [logs, setLogs] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [filterDate, setFilterDate] = useState("");
   const [filterUser, setFilterUser] = useState("");
   const [filterAction, setFilterAction] = useState("");
@@ -32,10 +45,10 @@ const SystemLogs = () => {
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:9999/system_logs"),
-      axios.get("http://localhost:9999/users"),
+      axios.get<Log[]>("http://localhost:9999/system_logs"),
+      axios.get<User[]>("http://localhost:9999/users"),
     ]).then(([l, u]) => {
-      setLogs(l.data.reverse());
+      setLogs([...l.data].reverse());
       setUsers(u.data);
     });
   }, []);
@@ -62,7 +75,15 @@ const SystemLogs = () => {
   return (
     <div>
       <div className="page-header">
-        <h4>📋 System Logs</h4>
+        <div className="page-header-left">
+          <div className="page-header-icon" style={{ background: "#f0f9ff" }}>
+            📋
+          </div>
+          <div>
+            <h4 style={{ margin: 0 }}>System Logs</h4>
+            <div className="page-header-sub">Track all user activity</div>
+          </div>
+        </div>
       </div>
 
       <div className="card-box">

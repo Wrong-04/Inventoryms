@@ -8,25 +8,47 @@ import Pagination from "../../components/Pagination";
 const ROLES = ["admin", "manager", "salesperson"];
 const PAGE_SIZE = 8;
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  password?: string;
+  loginAttempts?: number;
+  lockedUntil?: string | null;
+}
+interface FormState {
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
+
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [modal, setModal] = useState({ show: false, user: null });
-  const [form, setForm] = useState({
+  const [modal, setModal] = useState<{ show: boolean; user: User | null }>({
+    show: false,
+    user: null,
+  });
+  const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
     role: "salesperson",
     status: "active",
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [confirm, setConfirm] = useState({ show: false });
+  const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const load = () =>
-    axios.get("http://localhost:9999/users").then((r) => setUsers(r.data));
+    axios
+      .get<User[]>("http://localhost:9999/users")
+      .then((r) => setUsers(r.data));
   useEffect(() => {
     load();
   }, []);
@@ -49,18 +71,18 @@ const UserManagement = () => {
     setErrors({});
     setModal({ show: true, user: null });
   };
-  const openEdit = (u) => {
+  const openEdit = (u: User) => {
     setForm({ name: u.name, email: u.email, role: u.role, status: u.status });
     setErrors({});
     setModal({ show: true, user: u });
   };
 
   const validate = async () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.name.trim()) e.name = "Name is required.";
     if (!form.email.trim()) e.email = "Email is required.";
     else {
-      const res = await axios.get(
+      const res = await axios.get<User[]>(
         `http://localhost:9999/users?email=${form.email}`,
       );
       const dup = res.data.find((u) => !modal.user || u.id !== modal.user.id);
@@ -97,7 +119,7 @@ const UserManagement = () => {
     }
   };
 
-  const handleDelete = (u) => {
+  const handleDelete = (u: User) => {
     setConfirm({
       show: true,
       title: "Delete User",
@@ -119,7 +141,7 @@ const UserManagement = () => {
     });
   };
 
-  const handleResetPassword = (u) => {
+  const handleResetPassword = (u: User) => {
     setConfirm({
       show: true,
       title: "Reset Password",
@@ -149,7 +171,7 @@ const UserManagement = () => {
     });
   };
 
-  const roleBadge = (r) => {
+  const roleBadge = (r: string) => {
     if (r === "admin") return "badge-role badge-admin";
     if (r === "manager") return "badge-role badge-manager";
     return "badge-role badge-salesperson";
@@ -158,7 +180,15 @@ const UserManagement = () => {
   return (
     <div>
       <div className="page-header">
-        <h4>👥 User Account Management</h4>
+        <div className="page-header-left">
+          <div className="page-header-icon" style={{ background: "#f0f9ff" }}>
+            👥
+          </div>
+          <div>
+            <h4 style={{ margin: 0 }}>User Account Management</h4>
+            <div className="page-header-sub">Manage system users and roles</div>
+          </div>
+        </div>
       </div>
 
       <div

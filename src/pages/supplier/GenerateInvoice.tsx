@@ -4,6 +4,8 @@ import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
 import ConfirmModal from "../../components/ConfirmModal";
 
+import Pagination from "../../components/Pagination";
+
 interface OrderItem {
   productId: string;
   productName: string;
@@ -35,6 +37,11 @@ const GenerateInvoice = () => {
   const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterSupplier, setFilterSupplier] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 8;
 
   const load = () =>
     Promise.all([
@@ -55,6 +62,20 @@ const GenerateInvoice = () => {
     suppliers.find((s) => s.id === id)?.name || id;
   const hasInvoice = (orderId: string) =>
     invoices.some((i) => i.orderId === orderId);
+
+  const filteredOrders = orders.filter((o) => {
+    if (filterStatus !== "all" && o.status !== filterStatus) return false;
+    if (filterSupplier && o.supplierId !== filterSupplier) return false;
+    if (search && !o.orderCode.toLowerCase().includes(search.toLowerCase()))
+      return false;
+    return true;
+  });
+
+  const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
+  const paginated = filteredOrders.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
 
   const handleGenerateClick = (order: Order) => {
     setConfirm({
@@ -160,31 +181,79 @@ const GenerateInvoice = () => {
         </div>
       </div>
 
-      {/* Flow hint */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          marginBottom: 16,
-          fontSize: 13,
-          color: "#64748b",
-        }}
-      >
-        <span className="badge-status badge-pending">Pending</span>
-        <span>→</span>
-        <span className="badge-status badge-invoiced">Invoiced</span>
-        <span>→</span>
-        <span className="badge-status badge-completed">Received</span>
-        <span style={{ marginLeft: 8, color: "#94a3b8" }}>
-          Stock is updated only after "Receive Goods"
-        </span>
+      <div className="card-box" style={{ marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "flex-end",
+          }}
+        >
+          <div style={{ flex: "1 1 200px" }}>
+            <label className="form-label-ims">Search</label>
+            <input
+              className="form-control-ims"
+              placeholder="Search by order code..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          <div>
+            <label className="form-label-ims">Status</label>
+            <select
+              className="form-select-ims"
+              style={{ width: 180 }}
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="invoiced">Invoiced</option>
+              <option value="received">Received</option>
+            </select>
+          </div>
+          <div>
+            <label className="form-label-ims">Supplier</label>
+            <select
+              className="form-select-ims"
+              style={{ width: 200 }}
+              value={filterSupplier}
+              onChange={(e) => setFilterSupplier(e.target.value)}
+            >
+              <option value="">All Suppliers</option>
+              {suppliers.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {(filterStatus !== "all" || filterSupplier || search) && (
+            <button
+              className="btn-secondary-ims"
+              onClick={() => {
+                setFilterStatus("all");
+                setFilterSupplier("");
+                setSearch("");
+                setPage(1);
+              }}
+            >
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
         <div className="table-toolbar">
           <span className="table-toolbar-title">Purchase Orders</span>
-          <span className="table-toolbar-meta">{orders.length} order(s)</span>
+          <span className="table-toolbar-meta">
+            {filteredOrders.length} order(s)
+          </span>{" "}
         </div>
         <table className="ims-table">
           <thead>
@@ -200,7 +269,7 @@ const GenerateInvoice = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.length === 0 && (
+            {filteredOrders.length === 0 && (
               <tr>
                 <td colSpan={8}>
                   <div className="empty-state">
@@ -210,7 +279,7 @@ const GenerateInvoice = () => {
                 </td>
               </tr>
             )}
-            {orders.map((o, idx) => (
+            {paginated.map((o, idx) => (
               <>
                 <tr key={o.id}>
                   <td>{idx + 1}</td>
@@ -328,6 +397,13 @@ const GenerateInvoice = () => {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onChange={setPage}
+          total={filteredOrders.length}
+          pageSize={PAGE_SIZE}
+        />
       </div>
 
       <ConfirmModal

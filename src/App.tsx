@@ -89,7 +89,7 @@ function App() {
           <Route
             path="sales/receipt"
             element={
-              <PrivateRoute roles={["salesperson"]}>
+              <PrivateRoute roles={["salesperson", "manager"]}>
                 <GenerateReceipt />
               </PrivateRoute>
             }
@@ -97,7 +97,7 @@ function App() {
           <Route
             path="sales/cancel-receipt"
             element={
-              <PrivateRoute roles={["salesperson"]}>
+              <PrivateRoute roles={["salesperson", "manager"]}>
                 <CancelReceipt />
               </PrivateRoute>
             }
@@ -105,7 +105,7 @@ function App() {
           <Route
             path="sales/customer-request"
             element={
-              <PrivateRoute roles={["salesperson"]}>
+              <PrivateRoute roles={["salesperson", "manager"]}>
                 <CustomerRequest />
               </PrivateRoute>
             }
