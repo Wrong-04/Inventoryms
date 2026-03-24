@@ -33,6 +33,7 @@ const CancelReceipt = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -60,7 +61,8 @@ const CancelReceipt = () => {
 
   const filtered = receipts.filter(
     (r) =>
-      !search || r.receiptCode.toLowerCase().includes(search.toLowerCase()),
+      (!search || r.receiptCode.toLowerCase().includes(search.toLowerCase())) &&
+      (filterStatus === "all" || r.status === filterStatus),
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -80,9 +82,7 @@ const CancelReceipt = () => {
             );
             await axios.patch(
               `http://localhost:9999/products/${item.productId}`,
-              {
-                quantity: pRes.data.quantity + item.quantity,
-              },
+              { quantity: pRes.data.quantity + item.quantity },
             );
           }
           await axios.patch(`http://localhost:9999/receipts/${receipt.id}`, {
@@ -131,16 +131,41 @@ const CancelReceipt = () => {
       </div>
 
       <div className="card-box" style={{ marginBottom: 16 }}>
-        <input
-          className="form-control-ims"
-          style={{ maxWidth: 280 }}
-          placeholder="Search by receipt code..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "flex-end",
           }}
-        />
+        >
+          <input
+            className="form-control-ims"
+            style={{ maxWidth: 240 }}
+            placeholder="Search by receipt code..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
+          <div>
+            <label className="form-label-ims">Status</label>
+            <select
+              className="form-select-ims"
+              style={{ width: 180 }}
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="all">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>

@@ -24,11 +24,20 @@ const GenerateReceipt = () => {
   const [foundProduct, setFoundProduct] = useState<Product | null>(null);
   const [qty, setQty] = useState("");
   const [items, setItems] = useState<ReceiptItem[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  // confirmation screen state
+  const [generatedReceipt, setGeneratedReceipt] = useState<{
+    code: string;
+    total: number;
+    customerName: string;
+    items: ReceiptItem[];
+    subtotal: number;
+    discount: number;
+    tax: number;
+  } | null>(null);
 
   const handleAddItem = () => {
     const e: Record<string, string> = {};
@@ -114,16 +123,12 @@ const GenerateReceipt = () => {
       const custRes = await axios.get<
         { id: string; name: string; phone: string }[]
       >(`http://localhost:9999/customers?phone=${customerPhone}`);
-      if (custRes.data.length > 0) {
+      if (customerPhone && custRes.data.length > 0) {
         customerId = custRes.data[0].id;
       } else {
         const newCust = await axios.post<{ id: string }>(
           "http://localhost:9999/customers",
-          {
-            name: customerName,
-            phone: customerPhone,
-            email: "",
-          },
+          { name: customerName, phone: customerPhone, email: "" },
         );
         customerId = newCust.data.id;
       }
@@ -160,14 +165,16 @@ const GenerateReceipt = () => {
         "Generate Receipt",
         `Generated receipt ${code} for ${customerName}`,
       );
-      toast.success(
-        `Receipt ${code} generated! Total: ${total.toLocaleString()} VND`,
-      );
-      setItems([]);
-      setCustomerName("");
-      setCustomerPhone("");
-      setFoundProduct(null);
-      setQty("");
+      // show confirmation screen instead of toast
+      setGeneratedReceipt({
+        code,
+        total,
+        customerName,
+        items: [...items],
+        subtotal,
+        discount,
+        tax,
+      });
     } catch {
       toast.error("Failed to generate receipt.");
     } finally {
@@ -175,6 +182,134 @@ const GenerateReceipt = () => {
     }
   };
 
+  const handleNewReceipt = () => {
+    setGeneratedReceipt(null);
+    setItems([]);
+    setCustomerName("");
+    setCustomerPhone("");
+    setFoundProduct(null);
+    setQty("");
+  };
+
+  // ── Confirmation screen ──────────────────────────────────────────────────
+  if (generatedReceipt) {
+    return (
+      <div>
+        <div className="page-header">
+          <div className="page-header-left">
+            <div className="page-header-icon" style={{ background: "#f0fdf4" }}>
+              🧾
+            </div>
+            <div>
+              <h4 style={{ margin: 0 }}>Receipt Generated</h4>
+              <div className="page-header-sub">
+                Transaction completed successfully
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: 560 }}>
+          <div
+            className="card-box"
+            style={{ borderLeft: "4px solid #16a34a", marginBottom: 16 }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              <span style={{ fontSize: 28 }}>✅</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 16 }}>
+                  {generatedReceipt.code}
+                </div>
+                <div style={{ fontSize: 13, color: "#15803d" }}>
+                  Receipt generated — stock has been updated
+                </div>
+              </div>
+            </div>
+
+            <div style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>
+              Customer: <strong>{generatedReceipt.customerName}</strong>
+            </div>
+
+            <table
+              style={{
+                width: "100%",
+                fontSize: 13,
+                borderCollapse: "collapse",
+              }}
+            >
+              <thead>
+                <tr style={{ color: "#94a3b8" }}>
+                  <th style={{ textAlign: "left", paddingBottom: 6 }}>
+                    Product
+                  </th>
+                  <th style={{ textAlign: "right", paddingBottom: 6 }}>Qty</th>
+                  <th style={{ textAlign: "right", paddingBottom: 6 }}>
+                    Subtotal
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {generatedReceipt.items.map((i) => (
+                  <tr
+                    key={i.productId}
+                    style={{ borderTop: "1px solid #e2e8f0" }}
+                  >
+                    <td style={{ padding: "5px 0" }}>{i.productName}</td>
+                    <td style={{ textAlign: "right" }}>{i.quantity}</td>
+                    <td style={{ textAlign: "right", fontWeight: 600 }}>
+                      {(i.quantity * i.unitPrice).toLocaleString()} VND
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div
+              style={{
+                marginTop: 12,
+                paddingTop: 12,
+                borderTop: "1px solid #e2e8f0",
+                fontSize: 13,
+              }}
+            >
+              <div style={{ color: "#64748b" }}>
+                Subtotal: {generatedReceipt.subtotal.toLocaleString()} VND
+              </div>
+              {generatedReceipt.discount > 0 && (
+                <div style={{ color: "#16a34a" }}>
+                  Discount: −{generatedReceipt.discount.toLocaleString()} VND
+                </div>
+              )}
+              <div style={{ color: "#dc2626" }}>
+                Tax: +{generatedReceipt.tax.toLocaleString()} VND
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginTop: 6 }}>
+                Total: {generatedReceipt.total.toLocaleString()} VND
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn-primary-ims" onClick={handleNewReceipt}>
+              + New Receipt
+            </button>
+            <button className="btn-secondary-ims" onClick={() => navigate("/")}>
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main form ────────────────────────────────────────────────────────────
   return (
     <div>
       <div className="page-header">
@@ -392,7 +527,7 @@ const GenerateReceipt = () => {
                 {loading ? (
                   <span className="btn-spinner" />
                 ) : (
-                  "🧾 Generate Receipt"
+                  "🧾 Submit Receipt"
                 )}
               </button>
               <button

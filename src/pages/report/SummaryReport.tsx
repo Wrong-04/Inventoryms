@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Pagination from "../../components/Pagination";
+
+const PAGE_SIZE = 10;
 
 const SummaryReport = () => {
   const [receipts, setReceipts] = useState([]);
@@ -7,12 +10,14 @@ const SummaryReport = () => {
   const [customers, setCustomers] = useState([]);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:9999/receipts"),
-      axios.get("http://localhost:9999/products"),
-      axios.get("http://localhost:9999/customers"),
+      axios.get<any[]>("http://localhost:9999/receipts"),
+      axios.get<any[]>("http://localhost:9999/products"),
+      axios.get<any[]>("http://localhost:9999/customers"),
     ]).then(([r, p, c]) => {
       setReceipts(r.data);
       setProducts(p.data);
@@ -20,27 +25,45 @@ const SummaryReport = () => {
     });
   }, []);
 
+  const getCustomerName = (id) =>
+    customers.find((c) => c.id === id)?.name || id;
+
   const filtered = receipts.filter((r) => {
     if (r.status !== "completed") return false;
     const d = new Date(r.createdAt);
     if (fromDate && d < new Date(fromDate)) return false;
     if (toDate && d > new Date(toDate + "T23:59:59")) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const custName = getCustomerName(r.customerId).toLowerCase();
+      if (!r.receiptCode.toLowerCase().includes(q) && !custName.includes(q))
+        return false;
+    }
     return true;
   });
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const totalRevenue = filtered.reduce((s, r) => s + r.total, 0);
   const totalDiscount = filtered.reduce((s, r) => s + r.discount, 0);
   const totalTax = filtered.reduce((s, r) => s + r.tax, 0);
   const lowStock = products.filter(
-    (p) => p.status === "active" && p.quantity <= 10,
+    (p: any) => p.status === "active" && p.quantity <= 10,
   );
-  const getCustomerName = (id) =>
-    customers.find((c) => c.id === id)?.name || id;
 
   return (
     <div>
-      <div className="page-header" style={{ justifyContent: "space-between" }}>
-        <h4>📈 Summary Report</h4>
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon" style={{ background: "#f0fdf4" }}>
+            📈
+          </div>
+          <div>
+            <h4 style={{ margin: 0 }}>Summary Report</h4>
+            <div className="page-header-sub">Sales overview and analytics</div>
+          </div>
+        </div>
         <button
           className="btn-secondary-ims"
           onClick={() => window.print()}
@@ -61,6 +84,18 @@ const SummaryReport = () => {
             flexWrap: "wrap",
           }}
         >
+          <div style={{ flex: "1 1 200px" }}>
+            <label className="form-label-ims">Search</label>
+            <input
+              className="form-control-ims"
+              placeholder="Search by receipt code or customer..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
           <div>
             <label className="form-label-ims">From Date</label>
             <input
@@ -68,7 +103,10 @@ const SummaryReport = () => {
               className="form-control-ims"
               style={{ width: 180 }}
               value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
+              onChange={(e) => {
+                setFromDate(e.target.value);
+                setPage(1);
+              }}
             />
           </div>
           <div>
@@ -78,15 +116,20 @@ const SummaryReport = () => {
               className="form-control-ims"
               style={{ width: 180 }}
               value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
+              onChange={(e) => {
+                setToDate(e.target.value);
+                setPage(1);
+              }}
             />
           </div>
-          {(fromDate || toDate) && (
+          {(fromDate || toDate || search) && (
             <button
               className="btn-secondary-ims"
               onClick={() => {
                 setFromDate("");
                 setToDate("");
+                setSearch("");
+                setPage(1);
               }}
             >
               Clear Filter
@@ -201,9 +244,11 @@ const SummaryReport = () => {
                 </td>
               </tr>
             )}
-            {filtered.map((r, idx) => (
+            {paginated.map((r, idx) => (
               <tr key={r.id}>
-                <td style={{ color: "#9ca3af" }}>{idx + 1}</td>
+                <td style={{ color: "#9ca3af" }}>
+                  {(page - 1) * PAGE_SIZE + idx + 1}
+                </td>
                 <td style={{ fontWeight: 600, color: "#2563eb" }}>
                   {r.receiptCode}
                 </td>
@@ -243,6 +288,13 @@ const SummaryReport = () => {
             </div>
           </div>
         )}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onChange={setPage}
+          total={filtered.length}
+          pageSize={PAGE_SIZE}
+        />
       </div>
 
       {/* Low stock alert */}

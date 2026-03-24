@@ -46,11 +46,17 @@ const PlaceOrder = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirm, setConfirm] = useState<any>({ show: false });
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [lowStockItems, setLowStockItems] = useState<Product[]>([]);
 
   useEffect(() => {
-    axios.get("http://localhost:9999/suppliers").then((r) => {
+    axios.get<any[]>("http://localhost:9999/suppliers").then((r) => {
       setSuppliers(r.data);
       if (r.data.length > 0) setSupplierId(r.data[0].id);
+    });
+    axios.get<Product[]>("http://localhost:9999/products").then((r) => {
+      setLowStockItems(
+        r.data.filter((p) => p.status === "active" && p.quantity <= 10),
+      );
     });
   }, []);
 
@@ -108,7 +114,9 @@ const PlaceOrder = () => {
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
-          const allRes = await axios.get("http://localhost:9999/orders");
+          const allRes = await axios.get<unknown[]>(
+            "http://localhost:9999/orders",
+          );
           const code = "ORD" + String(allRes.data.length + 1).padStart(3, "0");
           await axios.post("http://localhost:9999/orders", {
             orderCode: code,
@@ -211,6 +219,50 @@ const PlaceOrder = () => {
             )}
           </div>
         </div>
+
+        {lowStockItems.length > 0 && (
+          <div
+            className="alert-ims"
+            style={{
+              background: "#fffbeb",
+              border: "1px solid #fcd34d",
+              borderRadius: 8,
+              padding: "12px 16px",
+              marginBottom: 16,
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: 13,
+                color: "#92400e",
+                marginBottom: 8,
+              }}
+            >
+              ⚠ Low Stock Suggestions ({lowStockItems.length} item
+              {lowStockItems.length > 1 ? "s" : ""} need restocking)
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {lowStockItems.map((p) => (
+                <button
+                  key={p.id}
+                  style={{
+                    background: "#fef3c7",
+                    border: "1px solid #fcd34d",
+                    borderRadius: 6,
+                    padding: "4px 10px",
+                    fontSize: 12,
+                    cursor: "pointer",
+                    color: "#78350f",
+                  }}
+                  onClick={() => setFoundProduct(p)}
+                >
+                  {p.name} — {p.quantity} left
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="card-box" style={{ marginBottom: 16 }}>
           <div

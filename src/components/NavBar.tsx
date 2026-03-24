@@ -18,6 +18,10 @@ const NAV = {
       { icon: "🛒", label: "Place Order", to: "/supplier/place-order" },
       { icon: "🧾", label: "Invoices", to: "/supplier/invoice" },
     ],
+    Sales: [
+      { icon: "❌", label: "Cancel Receipt", to: "/sales/cancel-receipt" },
+      { icon: "📝", label: "Customer Request", to: "/sales/customer-request" },
+    ],
     Reports: [{ icon: "📈", label: "Summary Report", to: "/report" }],
   },
   salesperson: {
