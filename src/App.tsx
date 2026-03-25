@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import ChangePassword from "./pages/auth/ChangePassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import ItemSearch from "./pages/inventory/ItemSearch";
 import AddGoods from "./pages/inventory/AddGoods";
@@ -35,6 +36,7 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="inventory/search" element={<ItemSearch />} />
           <Route

@@ -136,11 +136,11 @@ const NavBar = () => {
         {/* User card at bottom */}
         <div className="sidebar-footer">
           <NavLink
-            to="/change-password"
+            to="/profile"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <span className="nav-icon">🔑</span>
-            <span>Change Password</span>
+            <span className="nav-icon">👤</span>
+            <span>My Profile</span>
           </NavLink>
           <div
             style={{
