@@ -710,6 +710,22 @@
       "action": "Place Order",
       "description": "Placed order ORD004 to supplier",
       "timestamp": "2026-03-22T08:05:00Z"
+    },
+    {
+      "id": "ff20",
+      "userId": "1",
+      "userName": "System Admin",
+      "action": "Logout",
+      "description": "User logged out",
+      "timestamp": "2026-03-25T16:09:42.206Z"
+    },
+    {
+      "id": "08e7",
+      "userId": "2",
+      "userName": "Inventory Manager",
+      "action": "Login",
+      "description": "Logged in successfully",
+      "timestamp": "2026-03-25T16:09:44.423Z"
     }
   ]
 }
