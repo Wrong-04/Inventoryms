@@ -40,10 +40,7 @@ const CancelReceipt = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const load = async () => {
-    const url =
-      user?.role === "manager" || user?.role === "admin"
-        ? "http://localhost:9999/receipts"
-        : `http://localhost:9999/receipts?createdBy=${user?.id}`;
+    const url = `http://localhost:9999/receipts?createdBy=${user?.id}`;
     const [r, c] = await Promise.all([
       axios.get<Receipt[]>(url),
       axios.get<Customer[]>("http://localhost:9999/customers"),
@@ -121,11 +118,7 @@ const CancelReceipt = () => {
           </div>
           <div>
             <h4 style={{ margin: 0 }}>Cancel Receipt</h4>
-            <div className="page-header-sub">
-              {user?.role === "manager" || user?.role === "admin"
-                ? "All receipts"
-                : "Your receipts"}
-            </div>
+            <div className="page-header-sub">Your receipts</div>
           </div>
         </div>
       </div>
