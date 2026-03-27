@@ -143,9 +143,12 @@ const CustomerRequest = () => {
   const statusClass = (s: string) =>
     s === "pending"
       ? "badge-status badge-pending"
-      : "badge-status badge-completed";
+      : s === "fulfilled"
+        ? "badge-status badge-completed"
+        : "badge-status badge-cancelled";
 
-  const canFulfill = false;
+  const isManager = user?.role === "manager" || user?.role === "admin";
+  const isSalesperson = user?.role === "salesperson";
 
   return (
     <div>
@@ -157,10 +160,28 @@ const CustomerRequest = () => {
           <div>
             <h4 style={{ margin: 0 }}>Customer Request</h4>
             <div className="page-header-sub">
-              Log and track product requests from customers
+              {isManager
+                ? "Review and approve customer product requests"
+                : "Log and track product requests from customers"}
             </div>
           </div>
         </div>
+        {isManager && (
+          <div
+            style={{
+              background: "#fffbeb",
+              border: "1px solid #fcd34d",
+              borderRadius: 8,
+              padding: "6px 14px",
+              fontSize: 12.5,
+              color: "#92400e",
+              fontWeight: 600,
+            }}
+          >
+            ⚠ {requests.filter((r) => r.status === "pending").length} pending
+            approval
+          </div>
+        )}
       </div>
 
       <div
@@ -171,74 +192,88 @@ const CustomerRequest = () => {
           flexWrap: "wrap",
         }}
       >
-        {/* Form */}
-        <div style={{ flex: "1 1 380px" }}>
-          <div className="card-box">
-            <div className="section-title">New Request</div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
-                <Field label="Product Name" required error={errors.productName}>
-                  <input
-                    className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
-                    value={form.productName}
-                    onChange={(e) =>
-                      setForm({ ...form, productName: e.target.value })
-                    }
-                    placeholder="Enter product name"
-                  />
-                </Field>
-                <Field
-                  label="Customer Name"
-                  required
-                  error={errors.customerName}
+        {/* Form — chỉ salesperson mới tạo request */}
+        {isSalesperson && (
+          <div style={{ flex: "1 1 380px" }}>
+            <div className="card-box">
+              <div className="section-title">New Request</div>
+              <form onSubmit={handleSubmit}>
+                <div
+                  className="form-row form-row-2"
+                  style={{ marginBottom: 16 }}
                 >
-                  <input
-                    className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
-                    value={form.customerName}
-                    onChange={(e) =>
-                      setForm({ ...form, customerName: e.target.value })
-                    }
-                    placeholder="Enter customer name"
-                  />
-                </Field>
-              </div>
-              <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
-                <Field label="Phone">
-                  <input
-                    className="form-control-ims"
-                    value={form.phone}
-                    onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
-                    }
-                    placeholder="Enter phone number"
-                  />
-                </Field>
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <Field label="Note">
-                  <textarea
-                    className="form-control-ims"
-                    rows={3}
-                    value={form.note}
-                    onChange={(e) => setForm({ ...form, note: e.target.value })}
-                    placeholder="Additional notes..."
-                  />
-                </Field>
-              </div>
-              <button
-                type="submit"
-                className="btn-primary-ims"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="btn-spinner" />
-                ) : (
-                  "📝 Submit Request"
-                )}
-              </button>
-            </form>
+                  <Field
+                    label="Product Name"
+                    required
+                    error={errors.productName}
+                  >
+                    <input
+                      className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
+                      value={form.productName}
+                      onChange={(e) =>
+                        setForm({ ...form, productName: e.target.value })
+                      }
+                      placeholder="Enter product name"
+                    />
+                  </Field>
+                  <Field
+                    label="Customer Name"
+                    required
+                    error={errors.customerName}
+                  >
+                    <input
+                      className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
+                      value={form.customerName}
+                      onChange={(e) =>
+                        setForm({ ...form, customerName: e.target.value })
+                      }
+                      placeholder="Enter customer name"
+                    />
+                  </Field>
+                </div>
+                <div
+                  className="form-row form-row-2"
+                  style={{ marginBottom: 16 }}
+                >
+                  <Field label="Phone">
+                    <input
+                      className="form-control-ims"
+                      value={form.phone}
+                      onChange={(e) =>
+                        setForm({ ...form, phone: e.target.value })
+                      }
+                      placeholder="Enter phone number"
+                    />
+                  </Field>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <Field label="Note">
+                    <textarea
+                      className="form-control-ims"
+                      rows={3}
+                      value={form.note}
+                      onChange={(e) =>
+                        setForm({ ...form, note: e.target.value })
+                      }
+                      placeholder="Additional notes..."
+                    />
+                  </Field>
+                </div>
+                <button
+                  type="submit"
+                  className="btn-primary-ims"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <span className="btn-spinner" />
+                  ) : (
+                    "📝 Submit Request"
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* List */}
         <div style={{ flex: "2 1 500px" }}>
@@ -284,13 +319,13 @@ const CustomerRequest = () => {
                   <th>Note</th>
                   <th>Logged by</th>
                   <th>Status</th>
-                  {canFulfill && <th>Action</th>}
+                  {isManager && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={canFulfill ? 8 : 7}>
+                    <td colSpan={isManager ? 8 : 7}>
                       <div className="empty-state">
                         <div className="empty-icon">📝</div>
                         <p>No requests found</p>
@@ -313,7 +348,7 @@ const CustomerRequest = () => {
                     <td>
                       <span className={statusClass(r.status)}>{r.status}</span>
                     </td>
-                    {canFulfill && (
+                    {isManager && (
                       <td>
                         {r.status === "pending" ? (
                           <button
@@ -321,7 +356,7 @@ const CustomerRequest = () => {
                             style={{ padding: "4px 12px", fontSize: 12.5 }}
                             onClick={() => handleFulfill(r)}
                           >
-                            ✓ Fulfill
+                            ✓ Approve
                           </button>
                         ) : (
                           <span className="text-muted-ims">—</span>
