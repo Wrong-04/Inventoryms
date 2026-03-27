@@ -19,6 +19,7 @@ const NAV = {
       { icon: "🧾", label: "Invoices", to: "/supplier/invoice" },
     ],
     Sales: [
+      { icon: "🧾", label: "Receipts", to: "/sales/receipt" },
       { icon: "❌", label: "Cancel Receipt", to: "/sales/cancel-receipt" },
       { icon: "📝", label: "Customer Request", to: "/sales/customer-request" },
     ],
@@ -38,23 +39,6 @@ const NAV = {
   },
   admin: {
     Overview: [{ icon: "📊", label: "Dashboard", to: "/" }],
-    Inventory: [
-      { icon: "📦", label: "Item Search", to: "/inventory/search" },
-      { icon: "➕", label: "Add Goods", to: "/inventory/add" },
-      { icon: "➖", label: "Remove Goods", to: "/inventory/remove" },
-      { icon: "💲", label: "Update Price", to: "/inventory/update-price" },
-      { icon: "⚠️", label: "Expired Goods", to: "/inventory/expired" },
-      { icon: "🔄", label: "Replace Item", to: "/inventory/replace" },
-    ],
-    Supplier: [
-      { icon: "🛒", label: "Place Order", to: "/supplier/place-order" },
-      { icon: "🧾", label: "Invoices", to: "/supplier/invoice" },
-    ],
-    Sales: [
-      { icon: "🧾", label: "Receipts", to: "/sales/receipt" },
-      { icon: "❌", label: "Cancel Receipt", to: "/sales/cancel-receipt" },
-      { icon: "📝", label: "Customer Request", to: "/sales/customer-request" },
-    ],
     Admin: [
       { icon: "👥", label: "Users", to: "/admin/users" },
       { icon: "📋", label: "System Logs", to: "/admin/logs" },
@@ -118,7 +102,7 @@ const NavBar = () => {
           {Object.entries(groups).map(([group, links]) => (
             <div key={group}>
               <div className="sidebar-section-label">{group}</div>
-              {links.map((l) => (
+              {(links as any[]).map((l) => (
                 <NavLink
                   key={l.to}
                   to={l.to}
@@ -135,13 +119,6 @@ const NavBar = () => {
 
         {/* User card at bottom */}
         <div className="sidebar-footer">
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <span className="nav-icon">👤</span>
-            <span>My Profile</span>
-          </NavLink>
           <div
             style={{
               margin: "10px 12px 4px",
@@ -204,10 +181,15 @@ const NavBar = () => {
         <header className="topbar">
           <span className="topbar-title">Inventory Management System</span>
           <div className="topbar-right">
-            <div className="topbar-user">
+            <NavLink 
+              to="/profile" 
+              className="topbar-user" 
+              style={{ textDecoration: "none" }}
+              title="View My Profile"
+            >
               <div className="user-avatar">{getInitials(user?.name)}</div>
               <div>
-                <div className="user-info-name">{user?.name}</div>
+                <div className="user-info-name" style={{ color: "#1a2332" }}>{user?.name}</div>
                 <div
                   className="user-info-role"
                   style={{ background: trs.bg, color: trs.color }}
@@ -215,7 +197,7 @@ const NavBar = () => {
                   {ROLE_LABEL[user?.role]}
                 </div>
               </div>
-            </div>
+            </NavLink>
             <div className="topbar-divider" />
             <button className="topbar-logout" onClick={handleLogout}>
               <span>↩</span> Logout

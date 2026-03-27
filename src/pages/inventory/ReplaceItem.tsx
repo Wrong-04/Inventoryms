@@ -188,13 +188,13 @@ const ReplaceItem = () => {
 
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr",
-              gap: 16,
-              alignItems: "start",
+              display: "flex",
+              gap: 24,
+              alignItems: "flex-start",
+              flexWrap: "wrap",
             }}
           >
-            <div>
+            <div style={{ flex: "1 1 200px" }}>
               <label className="form-label-ims">Old Item *</label>
               <ProductAutocomplete
                 onSelect={(p) => {
@@ -220,7 +220,7 @@ const ReplaceItem = () => {
             >
               →
             </div>
-            <div>
+            <div style={{ flex: "1 1 200px" }}>
               <label className="form-label-ims">New Item *</label>
               <ProductAutocomplete
                 onSelect={(p) => {

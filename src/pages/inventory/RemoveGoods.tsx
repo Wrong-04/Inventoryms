@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
+
+const Field = ({ label, required, error, children }: any) => (
+  <div>
+    <label className="form-label-ims">
+      {label} {required && <span style={{ color: "#ef4444" }}>*</span>}
+    </label>
+    {children}
+    {error && <div className="invalid-feedback-ims">{error}</div>}
+  </div>
+);
+
 import ConfirmModal from "../../components/ConfirmModal";
 import ProductAutocomplete, {
   Product,
@@ -184,32 +195,30 @@ const RemoveGoods = () => {
                 </div>
               </div>
 
-              <div style={{ marginBottom: 20, maxWidth: 200 }}>
-                <label className="form-label-ims">Quantity to Remove *</label>
-                <input
-                  type="number"
-                  min="1"
-                  max={product.quantity}
-                  className={`form-control-ims${errors.qty ? " is-invalid" : ""}`}
-                  value={removeQty}
-                  onChange={(e) => setRemoveQty(e.target.value)}
-                  placeholder="0"
-                />
-                {errors.qty && (
-                  <div className="invalid-feedback-ims">⚠ {errors.qty}</div>
-                )}
-                {removeQty &&
-                  parseInt(removeQty) > 0 &&
-                  parseInt(removeQty) <= product.quantity && (
-                    <div
-                      style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}
-                    >
-                      Stock after:{" "}
-                      <strong style={{ color: "#dc2626" }}>
-                        {product.quantity - parseInt(removeQty)}
-                      </strong>
-                    </div>
-                  )}
+              <div className="form-row form-row-2" style={{ marginBottom: 20 }}>
+                <Field label="Quantity to Remove" required error={errors.qty}>
+                  <input
+                    type="number"
+                    min="1"
+                    max={product.quantity}
+                    className={`form-control-ims${errors.qty ? " is-invalid" : ""}`}
+                    value={removeQty}
+                    onChange={(e) => setRemoveQty(e.target.value)}
+                    placeholder="0"
+                  />
+                  {removeQty &&
+                    parseInt(removeQty) > 0 &&
+                    parseInt(removeQty) <= product.quantity && (
+                      <div
+                        style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}
+                      >
+                        Stock after:{" "}
+                        <strong style={{ color: "#dc2626" }}>
+                          {product.quantity - parseInt(removeQty)}
+                        </strong>
+                      </div>
+                    )}
+                </Field>
               </div>
 
               {removeQty && parseInt(removeQty) > 0 && (

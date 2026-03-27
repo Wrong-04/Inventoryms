@@ -14,6 +14,7 @@ interface FormState {
   name: string;
   category: string;
   quantity: string;
+  price: string;
   supplierId: string;
   expiryDate: string;
 }
@@ -25,6 +26,7 @@ interface ExistingProduct {
 interface CustomerReq {
   id: string;
   productName: string;
+  customerName: string;
   status: string;
 }
 
@@ -61,6 +63,7 @@ const AddGoods = () => {
     name: "",
     category: "Electronics",
     quantity: "",
+    price: "",
     supplierId: "",
     expiryDate: "",
   });
@@ -71,24 +74,31 @@ const AddGoods = () => {
     existing: ExistingProduct | null;
   }>({ show: false, existing: null });
   const [dupLoading, setDupLoading] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState<CustomerReq[]>([]);
+  const [reqSearch, setReqSearch] = useState("");
 
   useEffect(() => {
     axios
       .get<Supplier[]>("http://localhost:9999/suppliers")
       .then((r) => setSuppliers(r.data));
+    axios
+      .get<CustomerReq[]>("http://localhost:9999/customer_requests?status=pending")
+      .then((r) => setPendingRequests(r.data));
   }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name.trim()) e.name = "Name is required.";
     if (!form.supplierId) e.supplierId = "Supplier is required.";
-    if (!form.quantity || parseInt(form.quantity) <= 0)
-      e.quantity = "Quantity must be > 0.";
+    if (form.quantity === "" || parseInt(form.quantity) < 0)
+      e.quantity = "Quantity must be ≥ 0.";
+    if (form.price === "" || parseFloat(form.price) < 0)
+      e.price = "Price must be ≥ 0.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleAddGoods = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
@@ -100,7 +110,7 @@ const AddGoods = () => {
         setDupModal({ show: true, existing: res.data[0] });
         return;
       }
-      await saveNew();
+      await saveNewProduct();
     } finally {
       setLoading(false);
     }
@@ -128,7 +138,7 @@ const AddGoods = () => {
     }
   };
 
-  const saveNew = async () => {
+  const saveNewProduct = async () => {
     const allRes = await axios.get<unknown[]>("http://localhost:9999/products");
     const newCode = "P" + String(allRes.data.length + 1).padStart(3, "0");
     await axios.post("http://localhost:9999/products", {
@@ -136,18 +146,20 @@ const AddGoods = () => {
       name: form.name,
       category: form.category,
       quantity: parseInt(form.quantity),
-      price: 0,
+      price: parseFloat(form.price) || 0,
       supplierId: form.supplierId,
       expiryDate: form.expiryDate || null,
       status: "active",
     });
-    await autoFulfillRequests(form.name);
+    if (parseInt(form.quantity) > 0)
+      await autoFulfillRequests(form.name);
     await addLog("Add Goods", `Added product ${form.name}`);
     toast.success(`Product "${form.name}" added successfully!`);
     setForm({
       name: "",
       category: "Electronics",
       quantity: "",
+      price: "",
       supplierId: "",
       expiryDate: "",
     });
@@ -160,7 +172,8 @@ const AddGoods = () => {
       await axios.patch(`http://localhost:9999/products/${existing.id}`, {
         quantity: existing.quantity + parseInt(form.quantity),
       });
-      await autoFulfillRequests(existing.name);
+      if (parseInt(form.quantity) > 0)
+        await autoFulfillRequests(existing.name);
       await addLog(
         "Add Goods",
         `Increased stock for ${existing.name} by ${form.quantity}`,
@@ -171,6 +184,7 @@ const AddGoods = () => {
         name: "",
         category: "Electronics",
         quantity: "",
+        price: "",
         supplierId: "",
         expiryDate: "",
       });
@@ -179,7 +193,7 @@ const AddGoods = () => {
     }
   };
 
-  const f = (key) => ({
+  const bindField = (key) => ({
     value: form[key],
     onChange: (e) => setForm({ ...form, [key]: e.target.value }),
   });
@@ -200,51 +214,22 @@ const AddGoods = () => {
         </div>
       </div>
 
-      <div style={{ maxWidth: 600 }}>
-        <div className="card-box">
-          {/* Auto ID banner */}
-          <div
-            style={{
-              background: "#f8fafc",
-              border: "1px dashed #cbd5e1",
-              borderRadius: 8,
-              padding: "10px 14px",
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <span style={{ fontSize: 18 }}>🏷️</span>
-            <div>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#94a3b8",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.4px",
-                }}
-              >
-                Product ID
-              </div>
-              <div style={{ fontSize: 13, color: "#64748b" }}>
-                Auto-generated on save
-              </div>
-            </div>
-          </div>
+      <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 500px" }}>
+          <div className="card-box">
 
-          <form onSubmit={handleSubmit}>
+
+          <form onSubmit={handleAddGoods}>
             <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
               <Field label="Product Name" required error={errors.name}>
                 <input
                   className={`form-control-ims${errors.name ? " is-invalid" : ""}`}
                   placeholder="e.g. Laptop Dell XPS"
-                  {...f("name")}
+                  {...bindField("name")}
                 />
               </Field>
               <Field label="Category" required>
-                <select className="form-select-ims" {...f("category")}>
+                <select className="form-select-ims" {...bindField("category")}>
                   {CATEGORIES.map((c) => (
                     <option key={c}>{c}</option>
                   ))}
@@ -256,16 +241,16 @@ const AddGoods = () => {
               <Field label="Initial Quantity" required error={errors.quantity}>
                 <input
                   type="number"
-                  min="1"
+                  min="0"
                   className={`form-control-ims${errors.quantity ? " is-invalid" : ""}`}
                   placeholder="0"
-                  {...f("quantity")}
+                  {...bindField("quantity")}
                 />
               </Field>
               <Field label="Supplier" required error={errors.supplierId}>
                 <select
                   className={`form-select-ims${errors.supplierId ? " is-invalid" : ""}`}
-                  {...f("supplierId")}
+                  {...bindField("supplierId")}
                 >
                   <option value="">-- Select Supplier --</option>
                   {suppliers.map((s) => (
@@ -277,19 +262,28 @@ const AddGoods = () => {
               </Field>
             </div>
 
-            <div style={{ marginBottom: 24 }}>
+            <div className="form-row form-row-2" style={{ marginBottom: 24 }}>
+              <Field label="Price (VND)" required error={errors.price}>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  className={`form-control-ims${errors.price ? " is-invalid" : ""}`}
+                  placeholder="e.g. 350000"
+                  {...bindField("price")}
+                />
+              </Field>
               <Field
                 label="Expiry Date"
-                hint="Leave blank for non-perishable items"
               >
                 <input
                   type="date"
                   className="form-control-ims"
-                  style={{ maxWidth: 220 }}
-                  {...f("expiryDate")}
+                  {...bindField("expiryDate")}
                 />
               </Field>
             </div>
+
 
             <div
               style={{
@@ -390,6 +384,71 @@ const AddGoods = () => {
           </div>
         </div>
       )}
+
+        {/* Pending Customer Requests panel */}
+        <div style={{ flex: "0 0 320px", width: "100%" }}>
+          <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
+            <div className="table-toolbar">
+            <div>
+              <div className="table-toolbar-title" style={{ color: "#d97706" }}>
+                📝 Pending Requests
+              </div>
+              <div className="table-toolbar-meta">
+                {pendingRequests.length} awaiting stock — click to fill name
+              </div>
+            </div>
+          </div>
+          {/* Search inside panel */}
+          <div style={{ padding: "8px 12px", borderBottom: "1px solid #f1f5f9" }}>
+            <input
+              className="form-control-ims"
+              style={{ fontSize: 12.5 }}
+              placeholder="Filter requests..."
+              value={reqSearch}
+              onChange={(e) => setReqSearch(e.target.value)}
+            />
+          </div>
+          {(() => {
+            const filtered = pendingRequests.filter((r) =>
+              r.productName.toLowerCase().includes(reqSearch.toLowerCase()) ||
+              r.customerName.toLowerCase().includes(reqSearch.toLowerCase())
+            );
+            return filtered.length === 0 ? (
+              <div style={{ padding: "20px 16px", color: "#94a3b8", fontSize: 13, textAlign: "center" }}>
+                {pendingRequests.length === 0 ? "✅ No pending requests" : "No matches found"}
+              </div>
+            ) : (
+              <div style={{ padding: "8px 12px", display: "flex", flexDirection: "column", gap: 6, maxHeight: 360, overflowY: "auto" }}>
+                {filtered.map((req) => (
+                  <button
+                    key={req.id}
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, name: req.productName }))}
+                    style={{
+                      background: "linear-gradient(135deg,#fffbeb,#fef9c3)",
+                      border: "1px solid #fcd34d",
+                      borderRadius: 8,
+                      padding: "9px 12px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      color: "#78350f",
+                      fontFamily: "inherit",
+                      transition: "opacity 0.15s",
+                    }}
+                    title={`Click to fill: ${req.productName}`}
+                  >
+                    <div style={{ fontWeight: 600, marginBottom: 2 }}>{req.productName}</div>
+                    <div style={{ fontSize: 11.5, color: "#92400e" }}>👤 {req.customerName}</div>
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+        </div>
+      </div>
+
     </div>
   );
 };

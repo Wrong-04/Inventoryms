@@ -80,8 +80,8 @@ const GenerateInvoice = () => {
   const handleGenerateClick = (order: Order) => {
     setConfirm({
       show: true,
-      title: "Generate Invoice",
-      message: `Generate invoice for order ${order.orderCode}? Total: ${order.total.toLocaleString()} VND`,
+      title: "Generate Invoice & Receive Goods",
+      message: `Generate invoice for order ${order.orderCode} and update stock automatically? Total: ${order.total.toLocaleString()} VND`,
       variant: "primary",
       onConfirm: async () => {
         setConfirmLoading(true);
@@ -96,15 +96,25 @@ const GenerateInvoice = () => {
             total: order.total,
             createdAt: new Date().toISOString(),
           });
+          // Update stock for each item
+          for (const item of order.items || []) {
+            const pRes = await axios.get<{ quantity: number }>(
+              `http://localhost:9999/products/${item.productId}`,
+            );
+            await axios.patch(
+              `http://localhost:9999/products/${item.productId}`,
+              { quantity: pRes.data.quantity + item.quantity },
+            );
+          }
           await axios.patch(`http://localhost:9999/orders/${order.id}`, {
-            status: "invoiced",
+            status: "received",
           });
           await addLog(
             "Generate Invoice",
-            `Generated invoice ${code} for order ${order.orderCode}`,
+            `Generated invoice ${code} and received goods for order ${order.orderCode}`,
           );
           toast.success(
-            `Invoice ${code} generated for order ${order.orderCode}.`,
+            `Invoice ${code} generated. Goods received & stock updated for order ${order.orderCode}.`,
           );
           load();
         } catch {
@@ -117,50 +127,10 @@ const GenerateInvoice = () => {
     });
   };
 
-  const handleReceiveClick = (order: Order) => {
-    setConfirm({
-      show: true,
-      title: "Confirm Goods Received",
-      message: `Confirm receiving goods for order ${order.orderCode}? Stock will be updated automatically for ${order.items?.length || 0} item(s).`,
-      variant: "primary",
-      onConfirm: async () => {
-        setConfirmLoading(true);
-        try {
-          for (const item of order.items || []) {
-            const pRes = await axios.get<{ quantity: number }>(
-              `http://localhost:9999/products/${item.productId}`,
-            );
-            await axios.patch(
-              `http://localhost:9999/products/${item.productId}`,
-              {
-                quantity: pRes.data.quantity + item.quantity,
-              },
-            );
-          }
-          await axios.patch(`http://localhost:9999/orders/${order.id}`, {
-            status: "received",
-          });
-          await addLog(
-            "Receive Goods",
-            `Received goods for order ${order.orderCode}`,
-          );
-          toast.success(
-            `Goods received for order ${order.orderCode}. Stock updated.`,
-          );
-          load();
-        } catch {
-          toast.error("Failed to receive goods.");
-        } finally {
-          setConfirmLoading(false);
-          setConfirm({ show: false });
-        }
-      },
-    });
-  };
+
 
   const statusBadge = (s: string) => {
     if (s === "received") return "badge-status badge-completed";
-    if (s === "invoiced") return "badge-status badge-invoiced";
     if (s === "pending") return "badge-status badge-pending";
     return "badge-status badge-active";
   };
@@ -212,7 +182,6 @@ const GenerateInvoice = () => {
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
-              <option value="invoiced">Invoiced</option>
               <option value="received">Received</option>
             </select>
           </div>
@@ -302,26 +271,13 @@ const GenerateInvoice = () => {
                     </button>
                   </td>
                   <td>
-                    {o.status === "pending" && !hasInvoice(o.id) && (
+                    {o.status === "pending" && (
                       <button
                         className="btn-primary-ims"
                         style={{ padding: "5px 12px", fontSize: 13 }}
                         onClick={() => handleGenerateClick(o)}
                       >
-                        Generate Invoice
-                      </button>
-                    )}
-                    {o.status === "invoiced" && (
-                      <button
-                        className="btn-primary-ims"
-                        style={{
-                          padding: "5px 12px",
-                          fontSize: 13,
-                          background: "#16a34a",
-                        }}
-                        onClick={() => handleReceiveClick(o)}
-                      >
-                        ✓ Receive Goods
+                        🧾 Generate Invoice
                       </button>
                     )}
                     {o.status === "received" && (
