@@ -128,7 +128,6 @@ const CustomerRequest = () => {
     }
   };
 
-
   const filtered = requests.filter((r) => {
     const q = search.toLowerCase();
     const matchSearch =
@@ -146,7 +145,7 @@ const CustomerRequest = () => {
       ? "badge-status badge-pending"
       : "badge-status badge-completed";
 
-  const canFulfill = user?.role === "manager" || user?.role === "admin";
+  const canFulfill = false;
 
   return (
     <div>
@@ -175,162 +174,172 @@ const CustomerRequest = () => {
         {/* Form */}
         <div style={{ flex: "1 1 380px" }}>
           <div className="card-box">
-          <div className="section-title">New Request</div>
-          <form onSubmit={handleSubmit}>
-            <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
-              <Field label="Product Name" required error={errors.productName}>
-                <input
-                  className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
-                  value={form.productName}
-                  onChange={(e) =>
-                    setForm({ ...form, productName: e.target.value })
-                  }
-                  placeholder="Enter product name"
-                />
-              </Field>
-              <Field label="Customer Name" required error={errors.customerName}>
-                <input
-                  className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
-                  value={form.customerName}
-                  onChange={(e) =>
-                    setForm({ ...form, customerName: e.target.value })
-                  }
-                  placeholder="Enter customer name"
-                />
-              </Field>
-            </div>
-            <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
-              <Field label="Phone">
-                <input
-                  className="form-control-ims"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="Enter phone number"
-                />
-              </Field>
-            </div>
-            <div style={{ marginBottom: 20 }}>
-              <Field label="Note">
-                <textarea
-                  className="form-control-ims"
-                  rows={3}
-                  value={form.note}
-                  onChange={(e) => setForm({ ...form, note: e.target.value })}
-                  placeholder="Additional notes..."
-                />
-              </Field>
-            </div>
-            <button
-              type="submit"
-              className="btn-primary-ims"
-              disabled={loading}
-            >
-              {loading ? <span className="btn-spinner" /> : "📝 Submit Request"}
-            </button>
-          </form>
-        </div>
+            <div className="section-title">New Request</div>
+            <form onSubmit={handleSubmit}>
+              <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
+                <Field label="Product Name" required error={errors.productName}>
+                  <input
+                    className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
+                    value={form.productName}
+                    onChange={(e) =>
+                      setForm({ ...form, productName: e.target.value })
+                    }
+                    placeholder="Enter product name"
+                  />
+                </Field>
+                <Field
+                  label="Customer Name"
+                  required
+                  error={errors.customerName}
+                >
+                  <input
+                    className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
+                    value={form.customerName}
+                    onChange={(e) =>
+                      setForm({ ...form, customerName: e.target.value })
+                    }
+                    placeholder="Enter customer name"
+                  />
+                </Field>
+              </div>
+              <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
+                <Field label="Phone">
+                  <input
+                    className="form-control-ims"
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
+                    placeholder="Enter phone number"
+                  />
+                </Field>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <Field label="Note">
+                  <textarea
+                    className="form-control-ims"
+                    rows={3}
+                    value={form.note}
+                    onChange={(e) => setForm({ ...form, note: e.target.value })}
+                    placeholder="Additional notes..."
+                  />
+                </Field>
+              </div>
+              <button
+                type="submit"
+                className="btn-primary-ims"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="btn-spinner" />
+                ) : (
+                  "📝 Submit Request"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* List */}
         <div style={{ flex: "2 1 500px" }}>
           <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
-          <div className="table-toolbar">
-            <span className="table-toolbar-title">All Requests</span>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input
-                className="form-control-ims"
-                style={{ width: 200, fontSize: 12.5 }}
-                placeholder="Search product or customer..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-              />
-              <span className="table-toolbar-meta">
-                {filtered.length} request(s)
-              </span>
-              <select
-                className="form-select-ims"
-                style={{ fontSize: 12.5, padding: "4px 10px", width: "auto" }}
-                value={filterStatus}
-                onChange={(e) => {
-                  setFilterStatus(e.target.value);
-                  setPage(1);
-                }}
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="fulfilled">Fulfilled</option>
-              </select>
+            <div className="table-toolbar">
+              <span className="table-toolbar-title">All Requests</span>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input
+                  className="form-control-ims"
+                  style={{ width: 200, fontSize: 12.5 }}
+                  placeholder="Search product or customer..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                />
+                <span className="table-toolbar-meta">
+                  {filtered.length} request(s)
+                </span>
+                <select
+                  className="form-select-ims"
+                  style={{ fontSize: 12.5, padding: "4px 10px", width: "auto" }}
+                  value={filterStatus}
+                  onChange={(e) => {
+                    setFilterStatus(e.target.value);
+                    setPage(1);
+                  }}
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="fulfilled">Fulfilled</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <table className="ims-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Customer</th>
-                <th>Phone</th>
-                <th>Note</th>
-                <th>Logged by</th>
-                <th>Status</th>
-                {canFulfill && <th>Action</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.length === 0 && (
+            <table className="ims-table">
+              <thead>
                 <tr>
-                  <td colSpan={canFulfill ? 8 : 7}>
-                    <div className="empty-state">
-                      <div className="empty-icon">📝</div>
-                      <p>No requests found</p>
-                    </div>
-                  </td>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Note</th>
+                  <th>Logged by</th>
+                  <th>Status</th>
+                  {canFulfill && <th>Action</th>}
                 </tr>
-              )}
-              {paginated.map((r, idx) => (
-                <tr key={r.id}>
-                  <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                  <td style={{ fontWeight: 500 }}>{r.productName}</td>
-                  <td>{r.customerName}</td>
-                  <td>{r.phone || "—"}</td>
-                  <td style={{ color: "#6b7280", fontSize: 13 }}>
-                    {r.note || "—"}
-                  </td>
-                  <td style={{ fontSize: 12.5, color: "#64748b" }}>
-                    {r.createdByName || "—"}
-                  </td>
-                  <td>
-                    <span className={statusClass(r.status)}>{r.status}</span>
-                  </td>
-                  {canFulfill && (
-                    <td>
-                      {r.status === "pending" ? (
-                        <button
-                          className="btn-primary-ims"
-                          style={{ padding: "4px 12px", fontSize: 12.5 }}
-                          onClick={() => handleFulfill(r)}
-                        >
-                          ✓ Fulfill
-                        </button>
-                      ) : (
-                        <span className="text-muted-ims">—</span>
-                      )}
+              </thead>
+              <tbody>
+                {paginated.length === 0 && (
+                  <tr>
+                    <td colSpan={canFulfill ? 8 : 7}>
+                      <div className="empty-state">
+                        <div className="empty-icon">📝</div>
+                        <p>No requests found</p>
+                      </div>
                     </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onChange={setPage}
-            total={filtered.length}
-            pageSize={PAGE_SIZE}
-          />
-        </div>
+                  </tr>
+                )}
+                {paginated.map((r, idx) => (
+                  <tr key={r.id}>
+                    <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
+                    <td style={{ fontWeight: 500 }}>{r.productName}</td>
+                    <td>{r.customerName}</td>
+                    <td>{r.phone || "—"}</td>
+                    <td style={{ color: "#6b7280", fontSize: 13 }}>
+                      {r.note || "—"}
+                    </td>
+                    <td style={{ fontSize: 12.5, color: "#64748b" }}>
+                      {r.createdByName || "—"}
+                    </td>
+                    <td>
+                      <span className={statusClass(r.status)}>{r.status}</span>
+                    </td>
+                    {canFulfill && (
+                      <td>
+                        {r.status === "pending" ? (
+                          <button
+                            className="btn-primary-ims"
+                            style={{ padding: "4px 12px", fontSize: 12.5 }}
+                            onClick={() => handleFulfill(r)}
+                          >
+                            ✓ Fulfill
+                          </button>
+                        ) : (
+                          <span className="text-muted-ims">—</span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onChange={setPage}
+              total={filtered.length}
+              pageSize={PAGE_SIZE}
+            />
+          </div>
         </div>
       </div>
     </div>

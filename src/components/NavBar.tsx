@@ -18,19 +18,11 @@ const NAV = {
       { icon: "🛒", label: "Place Order", to: "/supplier/place-order" },
       { icon: "🧾", label: "Invoices", to: "/supplier/invoice" },
     ],
-    Sales: [
-      { icon: "🧾", label: "Receipts", to: "/sales/receipt" },
-      { icon: "❌", label: "Cancel Receipt", to: "/sales/cancel-receipt" },
-      { icon: "📝", label: "Customer Request", to: "/sales/customer-request" },
-    ],
     Reports: [{ icon: "📈", label: "Summary Report", to: "/report" }],
   },
   salesperson: {
     Overview: [{ icon: "📊", label: "Dashboard", to: "/" }],
-    Inventory: [
-      { icon: "📦", label: "Item Search", to: "/inventory/search" },
-      { icon: "🔄", label: "Replace Item", to: "/inventory/replace" },
-    ],
+    Inventory: [{ icon: "📦", label: "Item Search", to: "/inventory/search" }],
     Sales: [
       { icon: "🧾", label: "Receipts", to: "/sales/receipt" },
       { icon: "❌", label: "Cancel Receipt", to: "/sales/cancel-receipt" },
@@ -181,15 +173,17 @@ const NavBar = () => {
         <header className="topbar">
           <span className="topbar-title">Inventory Management System</span>
           <div className="topbar-right">
-            <NavLink 
-              to="/profile" 
-              className="topbar-user" 
+            <NavLink
+              to="/profile"
+              className="topbar-user"
               style={{ textDecoration: "none" }}
               title="View My Profile"
             >
               <div className="user-avatar">{getInitials(user?.name)}</div>
               <div>
-                <div className="user-info-name" style={{ color: "#1a2332" }}>{user?.name}</div>
+                <div className="user-info-name" style={{ color: "#1a2332" }}>
+                  {user?.name}
+                </div>
                 <div
                   className="user-info-role"
                   style={{ background: trs.bg, color: trs.color }}
