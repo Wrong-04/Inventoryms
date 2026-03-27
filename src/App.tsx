@@ -114,7 +114,7 @@ function App() {
           <Route
             path="sales/customer-request"
             element={
-              <PrivateRoute roles={["salesperson"]}>
+              <PrivateRoute roles={["salesperson", "manager"]}>
                 <CustomerRequest />
               </PrivateRoute>
             }

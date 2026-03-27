@@ -18,6 +18,9 @@ const NAV = {
       { icon: "🛒", label: "Place Order", to: "/supplier/place-order" },
       { icon: "🧾", label: "Invoices", to: "/supplier/invoice" },
     ],
+    Sales: [
+      { icon: "📝", label: "Customer Requests", to: "/sales/customer-request" },
+    ],
     Reports: [{ icon: "📈", label: "Summary Report", to: "/report" }],
   },
   salesperson: {
