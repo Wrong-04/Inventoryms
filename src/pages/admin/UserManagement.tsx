@@ -119,28 +119,6 @@ const UserManagement = () => {
     }
   };
 
-  const handleDelete = (u: User) => {
-    setConfirm({
-      show: true,
-      title: "Delete User",
-      message: `Are you sure you want to delete "${u.name}"? This action cannot be undone.`,
-      onConfirm: async () => {
-        setConfirmLoading(true);
-        try {
-          await axios.delete(`http://localhost:9999/users/${u.id}`);
-          await addLog("Manage Users", `Deleted user ${u.email}`);
-          toast.success(`User "${u.name}" deleted.`);
-          load();
-        } catch {
-          toast.error("Failed to delete user.");
-        } finally {
-          setConfirmLoading(false);
-          setConfirm({ show: false });
-        }
-      },
-    });
-  };
-
   const handleResetPassword = (u: User) => {
     setConfirm({
       show: true,
@@ -290,12 +268,7 @@ const UserManagement = () => {
                     >
                       Reset Pwd
                     </button>
-                    <button
-                      className="btn-danger-ims"
-                      onClick={() => handleDelete(u)}
-                    >
-                      Delete
-                    </button>
+
                   </div>
                 </td>
               </tr>

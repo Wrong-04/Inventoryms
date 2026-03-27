@@ -63,7 +63,14 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="inventory/replace" element={<ReplaceItem />} />
+          <Route
+            path="inventory/replace"
+            element={
+              <PrivateRoute roles={["salesperson", "manager"]}>
+                <ReplaceItem />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="inventory/expired"
             element={

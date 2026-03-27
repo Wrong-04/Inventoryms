@@ -482,7 +482,7 @@
         }
       ],
       "total": 6000000,
-      "status": "invoiced",
+      "status": "received",
       "createdBy": "2",
       "createdAt": "2026-03-10T09:00:00Z"
     },

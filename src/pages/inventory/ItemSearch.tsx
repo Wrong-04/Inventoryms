@@ -58,7 +58,10 @@ const ItemSearch = () => {
     }
   };
 
-  const sorted = [...filtered].sort((a, b) => {
+  const isTruncated = !selectedProduct && filtered.length > 50;
+  const displayList = isTruncated ? filtered.slice(0, 50) : filtered;
+
+  const sorted = [...displayList].sort((a, b) => {
     const av = a[sortKey];
     const bv = b[sortKey];
     if (typeof av === "number" && typeof bv === "number")
@@ -243,7 +246,7 @@ const ItemSearch = () => {
             {filtered.length} product(s) — click headers to sort
           </span>
         </div>
-        {!selectedProduct && filtered.length > 50 && (
+        {isTruncated && (
           <div
             className="alert-ims"
             style={{
@@ -256,8 +259,7 @@ const ItemSearch = () => {
               color: "#92400e",
             }}
           >
-            ⚠ Too many results ({filtered.length}). Consider filtering by
-            category or using the search above.
+            ⚠ Too many results ({filtered.length}). Showing first 50 — refine your search or filter by category.
           </div>
         )}
         <table className="ims-table">

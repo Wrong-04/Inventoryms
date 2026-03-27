@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
+
+const Field = ({ label, required, error, children }: any) => (
+  <div>
+    <label className="form-label-ims">
+      {label} {required && <span style={{ color: "#ef4444" }}>*</span>}
+    </label>
+    {children}
+    {error && <div className="invalid-feedback-ims">{error}</div>}
+  </div>
+);
+
 import ProductAutocomplete, {
   Product,
 } from "../../components/ProductAutocomplete";
@@ -131,22 +142,21 @@ const UpdatePrice = () => {
             </div>
 
             <div className="card-box">
-              <div style={{ marginBottom: 20 }}>
-                <label className="form-label-ims">New Price (VND) *</label>
-                <input
-                  type="number"
-                  min="1"
-                  className={`form-control-ims${error ? " is-invalid" : ""}`}
-                  style={{ maxWidth: 260 }}
-                  placeholder="Enter new price"
-                  value={newPrice}
-                  onChange={(e) => {
-                    setNewPrice(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
-                />
-                {error && <div className="invalid-feedback-ims">⚠ {error}</div>}
+              <div className="form-row form-row-2" style={{ marginBottom: 20 }}>
+                <Field label="New Price (VND)" required error={error}>
+                  <input
+                    type="number"
+                    min="1"
+                    className={`form-control-ims${error ? " is-invalid" : ""}`}
+                    placeholder="Enter new price"
+                    value={newPrice}
+                    onChange={(e) => {
+                      setNewPrice(e.target.value);
+                      setError("");
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
+                  />
+                </Field>
 
                 {priceDiff !== null && newPrice && parseFloat(newPrice) > 0 && (
                   <div

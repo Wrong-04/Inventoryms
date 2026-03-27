@@ -4,7 +4,17 @@ import { getUser, addLog } from "../../utils/auth";
 import { toast } from "../../utils/toast";
 import Pagination from "../../components/Pagination";
 
-const PAGE_SIZE = 8;
+const Field = ({ label, required, error, children }: any) => (
+  <div>
+    <label className="form-label-ims">
+      {label} {required && <span style={{ color: "#ef4444" }}>*</span>}
+    </label>
+    {children}
+    {error && <div className="invalid-feedback-ims">{error}</div>}
+  </div>
+);
+
+const PAGE_SIZE = 10;
 
 interface Request {
   id: string;
@@ -85,19 +95,39 @@ const CustomerRequest = () => {
 
   const handleFulfill = async (req: Request) => {
     try {
+      // Check if product is actually in stock
+      const productsRes = await axios.get<any[]>(
+        `http://localhost:9999/products?status=active`,
+      );
+      const lower = req.productName.toLowerCase();
+      const inStock = productsRes.data.find(
+        (p: any) =>
+          (p.name.toLowerCase().includes(lower) ||
+            lower.includes(p.name.toLowerCase())) &&
+          p.quantity > 0,
+      );
+
+      if (!inStock) {
+        toast.error(
+          `"${req.productName}" is not in stock. Add goods first before fulfilling.`,
+        );
+        return;
+      }
+
       await axios.patch(`http://localhost:9999/customer_requests/${req.id}`, {
         status: "fulfilled",
       });
       await addLog(
         "Customer Request",
-        `Marked request for "${req.productName}" as fulfilled`,
+        `Marked request for "${req.productName}" as fulfilled (in stock: ${inStock.name}, qty: ${inStock.quantity})`,
       );
-      toast.success("Request marked as fulfilled.");
+      toast.success(`Request marked as fulfilled.`);
       load();
     } catch {
       toast.error("Failed to update request.");
     }
   };
+
 
   const filtered = requests.filter((r) => {
     const q = search.toLowerCase();
@@ -136,64 +166,59 @@ const CustomerRequest = () => {
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "380px 1fr",
-          gap: 20,
-          alignItems: "start",
+          display: "flex",
+          gap: 24,
+          alignItems: "flex-start",
+          flexWrap: "wrap",
         }}
       >
         {/* Form */}
-        <div className="card-box">
+        <div style={{ flex: "1 1 380px" }}>
+          <div className="card-box">
           <div className="section-title">New Request</div>
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: 14 }}>
-              <label className="form-label-ims">Product Name *</label>
-              <input
-                className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
-                value={form.productName}
-                onChange={(e) =>
-                  setForm({ ...form, productName: e.target.value })
-                }
-                placeholder="Enter product name"
-              />
-              {errors.productName && (
-                <div className="invalid-feedback-ims">{errors.productName}</div>
-              )}
+            <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
+              <Field label="Product Name" required error={errors.productName}>
+                <input
+                  className={`form-control-ims${errors.productName ? " is-invalid" : ""}`}
+                  value={form.productName}
+                  onChange={(e) =>
+                    setForm({ ...form, productName: e.target.value })
+                  }
+                  placeholder="Enter product name"
+                />
+              </Field>
+              <Field label="Customer Name" required error={errors.customerName}>
+                <input
+                  className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
+                  value={form.customerName}
+                  onChange={(e) =>
+                    setForm({ ...form, customerName: e.target.value })
+                  }
+                  placeholder="Enter customer name"
+                />
+              </Field>
             </div>
-            <div style={{ marginBottom: 14 }}>
-              <label className="form-label-ims">Customer Name *</label>
-              <input
-                className={`form-control-ims${errors.customerName ? " is-invalid" : ""}`}
-                value={form.customerName}
-                onChange={(e) =>
-                  setForm({ ...form, customerName: e.target.value })
-                }
-                placeholder="Enter customer name"
-              />
-              {errors.customerName && (
-                <div className="invalid-feedback-ims">
-                  {errors.customerName}
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <label className="form-label-ims">Phone</label>
-              <input
-                className="form-control-ims"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="Enter phone number"
-              />
+            <div className="form-row form-row-2" style={{ marginBottom: 16 }}>
+              <Field label="Phone">
+                <input
+                  className="form-control-ims"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="Enter phone number"
+                />
+              </Field>
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label className="form-label-ims">Note</label>
-              <textarea
-                className="form-control-ims"
-                rows={3}
-                value={form.note}
-                onChange={(e) => setForm({ ...form, note: e.target.value })}
-                placeholder="Additional notes..."
-              />
+              <Field label="Note">
+                <textarea
+                  className="form-control-ims"
+                  rows={3}
+                  value={form.note}
+                  onChange={(e) => setForm({ ...form, note: e.target.value })}
+                  placeholder="Additional notes..."
+                />
+              </Field>
             </div>
             <button
               type="submit"
@@ -204,9 +229,11 @@ const CustomerRequest = () => {
             </button>
           </form>
         </div>
+        </div>
 
-        {/* Table */}
-        <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
+        {/* List */}
+        <div style={{ flex: "2 1 500px" }}>
+          <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
           <div className="table-toolbar">
             <span className="table-toolbar-title">All Requests</span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -303,6 +330,7 @@ const CustomerRequest = () => {
             total={filtered.length}
             pageSize={PAGE_SIZE}
           />
+        </div>
         </div>
       </div>
     </div>

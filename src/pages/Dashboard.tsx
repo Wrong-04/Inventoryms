@@ -170,17 +170,18 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Bottom grid */}
+      {/* Bottom section */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 290px",
-          gap: 20,
-          alignItems: "start",
+          display: "flex",
+          gap: 24,
+          alignItems: "flex-start",
+          flexWrap: "wrap",
         }}
       >
         {/* Recent Receipts */}
-        <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
+        <div style={{ flex: "1 1 500px" }}>
+          <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
           <div className="table-toolbar">
             <div>
               <div className="table-toolbar-title">Recent Receipts</div>
@@ -240,9 +241,11 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
+        </div>
 
-        {/* Low stock panel */}
-        <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
+        {/* Low Stock Items */}
+        <div style={{ flex: "0 0 320px", width: "100%" }}>
+          <div className="card-box" style={{ padding: 0, overflow: "hidden" }}>
           <div className="table-toolbar">
             <div>
               <div
@@ -295,6 +298,7 @@ const Dashboard = () => {
               </tbody>
             </table>
           )}
+        </div>
         </div>
       </div>
     </div>
